@@ -2,7 +2,7 @@ package config
 
 import (
 	"log/slog"
-	"mini-game-library/errors"
+	"mini-game-library/constant"
 	"os"
 	"strconv"
 	"time"
@@ -20,7 +20,7 @@ type Config struct {
 func Load() Config {
 	var config Config
 	if err := godotenv.Load(); err != nil {
-		panic(errors.ErrEnvLoading)
+		panic(constant.ErrEnvLoading)
 	}
 
 	accessExpireStr := os.Getenv("ACCESS_TOKEN_EXPIRE_SECONDS")
