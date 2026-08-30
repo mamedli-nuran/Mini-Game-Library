@@ -30,7 +30,7 @@ func NewUserService(repo UserRepo, jwtSecret string, accessExpire, refreshExpire
 	}
 }
 
-func (s UserService) RegisterUser(ctx context.Context, request dto.AuthRequest) (*models.User, error) {
+func (s UserService) RegisterUser(ctx context.Context, request dto.RegisterRequest) (*models.User, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err

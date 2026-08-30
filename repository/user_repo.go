@@ -2,11 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"mini-game-library/apperror"
 	"mini-game-library/models"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -20,13 +22,20 @@ func NewUserRepository(pool *pgxpool.Pool) *UserRepository {
 	}
 }
 
-func (r UserRepository) RegisterUser(ctx context.Context, user models.User, hash []byte) error {
+func (r *UserRepository) RegisterUser(ctx context.Context, user models.User, hash []byte) error {
 	sql := `INSERT INTO users (id, username, email, password) 
         	VALUES ($1, $2, $3, $4)`
 
 	_, err := r.pool.Exec(ctx, sql, user.Id, user.Username, user.Email, hash)
 	if err != nil {
-		slog.Info(err.Error())
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "23505" {
+				return apperror.ErrUserDuplicate
+			}
+		}
+
+		slog.Error("Database error during user registration", "error", err)
 		return fmt.Errorf("%w: %w", apperror.ErrRegisterUser, err)
 	}
 	return nil

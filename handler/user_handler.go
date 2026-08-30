@@ -12,7 +12,7 @@ import (
 )
 
 type UserService interface {
-	RegisterUser(ctx context.Context, request dto.AuthRequest) (*models.User, error)
+	RegisterUser(ctx context.Context, request dto.RegisterRequest) (*models.User, error)
 }
 type UserHandler struct {
 	svc UserService
@@ -25,7 +25,7 @@ func NewUserHandler(svc UserService) *UserHandler {
 }
 
 func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	var req dto.AuthRequest
+	var req dto.RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		WriteError(w, r, http.StatusBadRequest, constant.ErrInvalidBody)
 		return
@@ -40,7 +40,7 @@ func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	user, err := h.svc.RegisterUser(r.Context(), req)
 
 	if err != nil {
-		if errors.Is(err, apperror.ErrRegisterUser) {
+		if errors.Is(err, apperror.ErrUserDuplicate) {
 			WriteError(w, r, http.StatusConflict, constant.ErrUserAlreadyExists)
 		} else {
 			WriteError(w, r, http.StatusInternalServerError, constant.ErrInternalServerError)

@@ -6,19 +6,19 @@ import (
 	"strings"
 )
 
-type AuthRequest struct {
+type RegisterRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-func (r *AuthRequest) Sanitize() {
+func (r *RegisterRequest) Sanitize() {
 	r.Username = strings.ToLower(strings.TrimSpace(r.Username))
 	r.Email = strings.ToLower(strings.TrimSpace(r.Email))
 	r.Password = strings.TrimSpace(r.Password)
 }
 
-func (r *AuthRequest) Validate() []ErrorDetail {
+func (r *RegisterRequest) Validate() []ErrorDetail {
 	var errors []ErrorDetail
 	if r.Username == "" {
 		errors = append(errors, ErrorDetail{Field: "username", Message: constant.ErrUsernameRequired})

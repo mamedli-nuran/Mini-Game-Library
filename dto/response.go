@@ -20,14 +20,14 @@ type ErrorResponse struct {
 	Details   []ErrorDetail `json:"details,omitempty"`
 }
 
-type UserResponse struct {
+type RegisterResponse struct {
 	Id       uuid.UUID `json:"id"`
 	Username string    `json:"username"`
 	Email    string    `json:"email"`
 }
 
-func NewUserResponse(user *models.User) UserResponse {
-	return UserResponse{
+func NewUserResponse(user *models.User) RegisterResponse {
+	return RegisterResponse{
 		Id:       user.Id,
 		Username: user.Username,
 		Email:    user.Email,
