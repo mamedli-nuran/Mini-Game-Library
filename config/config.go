@@ -37,7 +37,7 @@ func Load() Config {
 	slog.Info("Successfully read data from .env file")
 
 	config.DatabaseURL = os.Getenv("DATABASE_URL")
-	config.AccessTokenExpireSeconds = time.Duration(accessExpire) * time.Minute
+	config.AccessTokenExpireSeconds = time.Duration(accessExpire) * time.Second
 	config.RefreshTokenExpireHours = time.Duration(refreshExpire) * time.Hour
 	config.JWTSecret = os.Getenv("JWT_SECRET")
 

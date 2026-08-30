@@ -8,7 +8,8 @@ CREATE TABLE users
     password   BYTEA        NOT NULL,
     created_at TIMESTAMP    NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP    NOT NULL DEFAULT NOW(),
-    UNIQUE (username, email)
+    UNIQUE (username),
+    UNIQUE (email)
 );
 
 COMMIT;
