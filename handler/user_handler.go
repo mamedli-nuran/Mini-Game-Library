@@ -47,6 +47,6 @@ func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	writeJSON(w, http.StatusCreated, user)
+	writeJSON(w, http.StatusCreated, dto.NewUserResponse(user))
 
 }
