@@ -40,3 +40,34 @@ func (r *UserRepository) RegisterUser(ctx context.Context, user models.User, has
 	}
 	return nil
 }
+
+func (r *UserRepository) FindUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	sql := `SELECT id, username, email, password, created_at, updated_at 
+			FROM users WHERE email=$1`
+
+	var user models.User
+	var password []byte
+	err := r.pool.QueryRow(ctx, sql, email).Scan(
+		&user.Id, &user.Username, &user.Email, &password, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = string(password)
+	return &user, nil
+
+}
+
+func (r *UserRepository) FindUserByUsername(ctx context.Context, username string) (*models.User, error) {
+	sql := `SELECT id, username, email, password, created_at, updated_at 
+			FROM users WHERE username=$1`
+
+	var user models.User
+	var password []byte
+	err := r.pool.QueryRow(ctx, sql, username).Scan(
+		&user.Id, &user.Username, &user.Email, &password, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = string(password)
+	return &user, nil
+}

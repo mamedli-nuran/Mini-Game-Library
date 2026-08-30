@@ -30,7 +30,7 @@ func main() {
 
 	userRepo := repository.NewUserRepository(pool)
 
-	userService := service.NewUserService(userRepo, cfg.JWTSecret, cfg.AccessTokenExpireSeconds, cfg.RefreshTokenExpireHours)
+	userService := service.NewUserService(userRepo, cfg)
 
 	userHandler := handler.NewUserHandler(userService)
 	mux := router.Setup(userHandler)

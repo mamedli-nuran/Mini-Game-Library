@@ -3,6 +3,9 @@ package apperror
 import "errors"
 
 var (
-	ErrRegisterUser  = errors.New("failed to create user")
-	ErrUserDuplicate = errors.New("user already exists")
+	ErrInternalServerError = "Internal Server Error"
+	ErrRegisterUser        = errors.New("failed to create user")
+	ErrUserDuplicate       = errors.New("user already exists")
+	ErrUserFind            = errors.New("can not find user in database")
+	ErrInvalidCredentials  = errors.New("invalid credentials")
 )

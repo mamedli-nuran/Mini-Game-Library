@@ -11,5 +11,6 @@ func Setup(
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /auth/register", userHandler.RegisterUser)
+	mux.HandleFunc("POST /auth/login", userHandler.Login)
 	return mux
 }
