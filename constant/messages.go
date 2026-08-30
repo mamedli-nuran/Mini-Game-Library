@@ -8,4 +8,8 @@ const (
 	ErrInvalidBody         = "Invalid body"
 	ErrUserAlreadyExists   = "User already exists or could not be created"
 	ErrInternalServerError = "Internal Server Error"
+
+	ErrUsernameRequired = "Username is required, please enter your username"
+	ErrUsernameLength   = "Your username field should be less than 20 and greater than 4"
+	ErrPasswordLength   = "Password must be between 12 and 25 characters."
 )

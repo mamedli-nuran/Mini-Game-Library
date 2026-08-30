@@ -20,7 +20,11 @@ func (r *AuthRequest) Sanitize() {
 
 func (r *AuthRequest) Validate() []ErrorDetail {
 	var errors []ErrorDetail
-	// todo validate password and username also
+	if r.Username == "" {
+		errors = append(errors, ErrorDetail{Field: "username", Message: constant.ErrUsernameRequired})
+	} else if usernameLen := len(r.Username); usernameLen < 4 || usernameLen > 20 {
+		errors = append(errors, ErrorDetail{Field: "username", Message: constant.ErrUsernameLength})
+	}
 
 	if r.Email == "" {
 		errors = append(errors, ErrorDetail{Field: "email", Message: constant.ErrEmailRequired})
@@ -28,5 +32,8 @@ func (r *AuthRequest) Validate() []ErrorDetail {
 		errors = append(errors, ErrorDetail{Field: "email", Message: constant.ErrInvalidEmail})
 	}
 
+	if pwlen := len(r.Password); pwlen < 12 || pwlen > 25 {
+		errors = append(errors, ErrorDetail{Field: "password", Message: constant.ErrPasswordLength})
+	}
 	return errors
 }

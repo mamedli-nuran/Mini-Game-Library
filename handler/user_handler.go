@@ -39,7 +39,6 @@ func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.svc.RegisterUser(r.Context(), req)
 
-	// todo handle this part of code
 	if err != nil {
 		if errors.Is(err, apperror.ErrRegisterUser) {
 			WriteError(w, r, http.StatusConflict, constant.ErrUserAlreadyExists)
