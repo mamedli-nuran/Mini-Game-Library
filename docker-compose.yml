@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: notes_api_postgres
+    container_name: mini-library-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
