@@ -21,15 +21,11 @@ type ErrorResponse struct {
 }
 
 type RegisterResponse struct {
-	Id       uuid.UUID `json:"id"`
-	Username string    `json:"username"`
-	Email    string    `json:"email"`
+	Id uuid.UUID `json:"id"`
 }
 
-func NewUserResponse(user *models.User) RegisterResponse {
+func NewRegisterResponse(user *models.User) RegisterResponse {
 	return RegisterResponse{
-		Id:       user.Id,
-		Username: user.Username,
-		Email:    user.Email,
+		Id: user.Id,
 	}
 }
