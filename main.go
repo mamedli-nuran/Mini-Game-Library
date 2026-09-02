@@ -33,7 +33,7 @@ func main() {
 	userService := service.NewUserService(userRepo, cfg)
 
 	userHandler := handler.NewUserHandler(userService)
-	mux := router.Setup(userHandler)
+	mux := router.Setup(userHandler, cfg)
 
 	slog.Info("Server starting on :8080")
 	err = http.ListenAndServe(":8080", mux)

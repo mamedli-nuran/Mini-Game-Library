@@ -15,6 +15,7 @@ import (
 type UserService interface {
 	RegisterUser(ctx context.Context, request dto.RegisterRequest) (*models.User, error)
 	LoginUser(ctx context.Context, request dto.LoginRequest) (*service.TokenPair, error)
+	GetMeInfo(ctx context.Context) (*models.User, error)
 }
 type UserHandler struct {
 	svc UserService
@@ -79,4 +80,21 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, struct {
 		AccessToken string
 	}{AccessToken: tokens.AccessToken})
+}
+
+func (h *UserHandler) MeInfo(w http.ResponseWriter, r *http.Request) {
+	user, err := h.svc.GetMeInfo(r.Context())
+	if err != nil {
+		if errors.Is(err, apperror.ErrUnauthorized) {
+			WriteError(w, r, http.StatusUnauthorized, constant.ErrUnauthorized)
+		} else if errors.Is(err, apperror.ErrUserFind) {
+			WriteError(w, r, http.StatusNotFound, "user not found")
+		} else {
+			WriteError(w, r, http.StatusInternalServerError, constant.ErrInternalServerError)
+		}
+		return
+	}
+
+	userResponse := dto.NewUserResponse(user)
+	writeJSON(w, http.StatusOK, userResponse)
 }

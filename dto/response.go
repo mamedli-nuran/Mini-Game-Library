@@ -2,6 +2,7 @@ package dto
 
 import (
 	"mini-game-library/models"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -27,5 +28,23 @@ type RegisterResponse struct {
 func NewRegisterResponse(user *models.User) RegisterResponse {
 	return RegisterResponse{
 		Id: user.Id,
+	}
+}
+
+type UserResponse struct {
+	Id        uuid.UUID `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+func NewUserResponse(user *models.User) UserResponse {
+	return UserResponse{
+		Id:        user.Id,
+		Username:  user.Username,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
 	}
 }

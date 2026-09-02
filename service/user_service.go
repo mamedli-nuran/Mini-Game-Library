@@ -7,6 +7,7 @@ import (
 	"errors"
 	"mini-game-library/apperror"
 	"mini-game-library/config"
+	"mini-game-library/constant"
 	"mini-game-library/dto"
 	"mini-game-library/models"
 	"net/mail"
@@ -22,6 +23,7 @@ type UserRepo interface {
 	RegisterUser(ctx context.Context, user models.User, hash []byte) error
 	FindUserByEmail(ctx context.Context, email string) (*models.User, error)
 	FindUserByUsername(ctx context.Context, username string) (*models.User, error)
+	FindUserById(ctx context.Context, userID uuid.UUID) (*models.User, error)
 }
 
 type UserService struct {
@@ -100,6 +102,20 @@ func (s *UserService) LoginUser(ctx context.Context, request dto.LoginRequest) (
 		RefreshToken: refreshToken,
 	}, nil
 
+}
+
+func (s *UserService) GetMeInfo(ctx context.Context) (*models.User, error) {
+	userID, ok := ctx.Value(constant.UserIDKey).(uuid.UUID)
+	if !ok {
+		return nil, apperror.ErrLoadingUserId
+	}
+
+	user, err := s.repo.FindUserById(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *UserService) generateAccessToken(id uuid.UUID) (string, error) {

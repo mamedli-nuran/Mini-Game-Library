@@ -8,6 +8,7 @@ import (
 	"mini-game-library/apperror"
 	"mini-game-library/models"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -69,5 +70,18 @@ func (r *UserRepository) FindUserByUsername(ctx context.Context, username string
 		return nil, err
 	}
 	user.Password = string(password)
+	return &user, nil
+}
+
+func (r *UserRepository) FindUserById(ctx context.Context, userID uuid.UUID) (*models.User, error) {
+	sql := `SELECT id, username, email, created_at, updated_at 
+			FROM users WHERE id=$1`
+
+	var user models.User
+	err := r.pool.QueryRow(ctx, sql, userID).Scan(
+		&user.Id, &user.Username, &user.Email, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
 	return &user, nil
 }
