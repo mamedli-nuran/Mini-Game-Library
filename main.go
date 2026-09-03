@@ -29,11 +29,15 @@ func main() {
 	slog.Info("Successfully connected to postgres")
 
 	userRepo := repository.NewUserRepository(pool)
+	gameRepo := repository.NewGameRepository(pool)
 
 	userService := service.NewUserService(userRepo, cfg)
+	gameService := service.NewGameService(gameRepo)
 
 	userHandler := handler.NewUserHandler(userService)
-	mux := router.Setup(userHandler, cfg)
+	gameHandler := handler.NewGameHandler(gameService)
+
+	mux := router.Setup(userHandler, gameHandler, cfg)
 
 	slog.Info("Server starting on :8080")
 	err = http.ListenAndServe(":8080", mux)

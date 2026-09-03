@@ -9,6 +9,7 @@ import (
 
 func Setup(
 	userHandler *handler.UserHandler,
+	gameHandler *handler.GameHandler,
 	cfg config.Config,
 ) *http.ServeMux {
 	mux := http.NewServeMux()

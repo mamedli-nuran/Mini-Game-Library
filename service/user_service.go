@@ -19,7 +19,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserRepo interface {
+type UserRepository interface {
 	RegisterUser(ctx context.Context, user models.User, hash []byte) error
 	FindUserByEmail(ctx context.Context, email string) (*models.User, error)
 	FindUserByUsername(ctx context.Context, username string) (*models.User, error)
@@ -27,7 +27,7 @@ type UserRepo interface {
 }
 
 type UserService struct {
-	repo UserRepo
+	repo UserRepository
 	cfg  config.Config
 }
 
@@ -36,7 +36,7 @@ type TokenPair struct {
 	RefreshToken string
 }
 
-func NewUserService(repo UserRepo, cfg config.Config) *UserService {
+func NewUserService(repo UserRepository, cfg config.Config) *UserService {
 	return &UserService{
 		repo: repo,
 		cfg:  cfg,
