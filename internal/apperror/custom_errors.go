@@ -10,4 +10,5 @@ var (
 	ErrInvalidCredentials  = errors.New("invalid credentials")
 	ErrLoadingUserId       = errors.New("user id can not be load from application context")
 	ErrUnauthorized        = errors.New("unauthorized")
+	ErrInvalidGenre        = errors.New("invalid genre")
 )

@@ -13,5 +13,7 @@ const (
 	ErrUsernameLength   = "Your username field should be less than 20 and greater than 4"
 	ErrPasswordLength   = "Password must be between 12 and 25 characters."
 
-	ErrUnauthorized = "User unauthorized"
+	ErrUnauthorized       = "User unauthorized"
+	ErrInvalidGenre       = "Invalid genre, please use real genre"
+	ErrInvalidReleaseYear = "Invalid release year, write only digits and valid year"
 )

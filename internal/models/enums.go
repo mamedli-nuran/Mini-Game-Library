@@ -1,5 +1,10 @@
 package models
 
+import (
+	"fmt"
+	"mini-game-library/internal/apperror"
+)
+
 type Genre string
 
 const (
@@ -27,3 +32,49 @@ const (
 	GenreMOBA            Genre = "MOBA"
 	GenreCasual          Genre = "Casual"
 )
+
+var validGenres = map[Genre]struct{}{
+	GenreAction:          {},
+	GenreAdventure:       {},
+	GenreActionAdventure: {},
+	GenreShooter:         {},
+	GenreFighting:        {},
+	GenreStealth:         {},
+	GenreRPG:             {},
+	GenreActionRPG:       {},
+	GenreJRPG:            {},
+	GenreMMORPG:          {},
+	GenreSimulation:      {},
+	GenreSports:          {},
+	GenreRacing:          {},
+	GenreStrategy:        {},
+	GenrePuzzle:          {},
+	GenrePlatformer:      {},
+	GenreHorror:          {},
+	GenreSurvival:        {},
+	GenreSandbox:         {},
+	GenreRoguelike:       {},
+	GenreMetroidvania:    {},
+	GenreMOBA:            {},
+	GenreCasual:          {},
+}
+
+func (g Genre) IsValid() bool {
+	_, ok := validGenres[g]
+	return ok
+}
+
+func (g Genre) Validate() error {
+	if !g.IsValid() {
+		return fmt.Errorf("%w: %q", apperror.ErrInvalidGenre, string(g))
+	}
+	return nil
+}
+
+func AllGenres() []Genre {
+	genres := make([]Genre, 0, len(validGenres))
+	for g := range validGenres {
+		genres = append(genres, g)
+	}
+	return genres
+}
