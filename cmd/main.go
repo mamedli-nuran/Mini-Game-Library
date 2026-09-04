@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"log/slog"
-	"mini-game-library/config"
-	"mini-game-library/handler"
-	"mini-game-library/repository"
-	"mini-game-library/router"
-	"mini-game-library/service"
+	"mini-game-library/internal/config"
+	handler2 "mini-game-library/internal/handler"
+	repository2 "mini-game-library/internal/repository"
+	"mini-game-library/internal/router"
+	service2 "mini-game-library/internal/service"
 	"net/http"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -28,14 +28,14 @@ func main() {
 	}
 	slog.Info("Successfully connected to postgres")
 
-	userRepo := repository.NewUserRepository(pool)
-	gameRepo := repository.NewGameRepository(pool)
+	userRepo := repository2.NewUserRepository(pool)
+	gameRepo := repository2.NewGameRepository(pool)
 
-	userService := service.NewUserService(userRepo, cfg)
-	gameService := service.NewGameService(gameRepo)
+	userService := service2.NewUserService(userRepo, cfg)
+	gameService := service2.NewGameService(gameRepo)
 
-	userHandler := handler.NewUserHandler(userService)
-	gameHandler := handler.NewGameHandler(gameService)
+	userHandler := handler2.NewUserHandler(userService)
+	gameHandler := handler2.NewGameHandler(gameService)
 
 	mux := router.Setup(userHandler, gameHandler, cfg)
 

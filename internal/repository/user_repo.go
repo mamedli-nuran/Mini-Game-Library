@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"mini-game-library/apperror"
-	"mini-game-library/models"
+	"mini-game-library/internal/apperror"
+	"mini-game-library/internal/models"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"

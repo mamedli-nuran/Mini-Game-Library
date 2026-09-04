@@ -1,5 +1,7 @@
 package handler
 
+import "net/http"
+
 type GameService interface {
 }
 
@@ -11,4 +13,8 @@ func NewGameHandler(svc GameService) *GameHandler {
 	return &GameHandler{
 		svc: svc,
 	}
+}
+
+func (h *GameHandler) GetGames(w http.ResponseWriter, r *http.Request) {
+
 }

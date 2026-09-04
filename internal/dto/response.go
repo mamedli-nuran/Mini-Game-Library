@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"mini-game-library/models"
+	"mini-game-library/internal/models"
 	"time"
 
 	"github.com/google/uuid"

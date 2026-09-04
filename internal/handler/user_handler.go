@@ -4,17 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"mini-game-library/apperror"
-	"mini-game-library/constant"
-	"mini-game-library/dto"
-	"mini-game-library/models"
-	"mini-game-library/service"
+	"mini-game-library/internal/apperror"
+	"mini-game-library/internal/constant"
+	dto2 "mini-game-library/internal/dto"
+	"mini-game-library/internal/models"
+	"mini-game-library/internal/service"
 	"net/http"
 )
 
 type UserService interface {
-	RegisterUser(ctx context.Context, request dto.RegisterRequest) (*models.User, error)
-	LoginUser(ctx context.Context, request dto.LoginRequest) (*service.TokenPair, error)
+	RegisterUser(ctx context.Context, request dto2.RegisterRequest) (*models.User, error)
+	LoginUser(ctx context.Context, request dto2.LoginRequest) (*service.TokenPair, error)
 	GetMeInfo(ctx context.Context) (*models.User, error)
 }
 type UserHandler struct {
@@ -28,7 +28,7 @@ func NewUserHandler(svc UserService) *UserHandler {
 }
 
 func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	var req dto.RegisterRequest
+	var req dto2.RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		WriteError(w, r, http.StatusBadRequest, constant.ErrInvalidBody)
 		return
@@ -50,12 +50,12 @@ func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	writeJSON(w, http.StatusCreated, dto.NewRegisterResponse(user))
+	writeJSON(w, http.StatusCreated, dto2.NewRegisterResponse(user))
 
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
-	var req dto.LoginRequest
+	var req dto2.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		WriteError(w, r, http.StatusBadRequest, constant.ErrInvalidBody)
 		return
@@ -95,6 +95,6 @@ func (h *UserHandler) MeInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userResponse := dto.NewUserResponse(user)
+	userResponse := dto2.NewUserResponse(user)
 	writeJSON(w, http.StatusOK, userResponse)
 }

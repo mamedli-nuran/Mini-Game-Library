@@ -2,7 +2,7 @@ package config
 
 import (
 	"log/slog"
-	"mini-game-library/constant"
+	"mini-game-library/internal/constant"
 	"os"
 	"strconv"
 	"time"

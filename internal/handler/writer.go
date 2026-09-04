@@ -2,7 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"mini-game-library/dto"
+	"mini-game-library/internal/dto"
 	"net/http"
 	"time"
 )

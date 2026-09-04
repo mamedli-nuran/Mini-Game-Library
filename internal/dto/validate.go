@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"mini-game-library/constant"
+	"mini-game-library/internal/constant"
 	"net/mail"
 )
 
