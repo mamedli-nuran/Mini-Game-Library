@@ -2,35 +2,36 @@ package models
 
 import (
 	"fmt"
+
 	"mini-game-library/internal/apperror"
 )
 
 type Genre string
 
 const (
-	GenreAction          Genre = "Action"
-	GenreAdventure       Genre = "Adventure"
-	GenreActionAdventure Genre = "Action-Adventure"
-	GenreShooter         Genre = "Shooter"
-	GenreFighting        Genre = "Fighting"
-	GenreStealth         Genre = "Stealth"
+	GenreAction          Genre = "ACTION"
+	GenreAdventure       Genre = "ADVENTURE"
+	GenreActionAdventure Genre = "ACTION_ADVENTURE"
+	GenreShooter         Genre = "SHOOTER"
+	GenreFighting        Genre = "FIGHTING"
+	GenreStealth         Genre = "STEALTH"
 	GenreRPG             Genre = "RPG"
-	GenreActionRPG       Genre = "Action RPG"
+	GenreActionRPG       Genre = "ACTION_RPG"
 	GenreJRPG            Genre = "JRPG"
 	GenreMMORPG          Genre = "MMORPG"
-	GenreSimulation      Genre = "Simulation"
-	GenreSports          Genre = "Sports"
-	GenreRacing          Genre = "Racing"
-	GenreStrategy        Genre = "Strategy"
-	GenrePuzzle          Genre = "Puzzle"
-	GenrePlatformer      Genre = "Platformer"
-	GenreHorror          Genre = "Horror"
-	GenreSurvival        Genre = "Survival"
-	GenreSandbox         Genre = "Sandbox"
-	GenreRoguelike       Genre = "Roguelike"
-	GenreMetroidvania    Genre = "Metroidvania"
+	GenreSimulation      Genre = "SIMULATION"
+	GenreSports          Genre = "SPORTS"
+	GenreRacing          Genre = "RACING"
+	GenreStrategy        Genre = "STRATEGY"
+	GenrePuzzle          Genre = "PUZZLE"
+	GenrePlatformer      Genre = "PLATFORMER"
+	GenreHorror          Genre = "HORROR"
+	GenreSurvival        Genre = "SURVIVAL"
+	GenreSandbox         Genre = "SANDBOX"
+	GenreRoguelike       Genre = "ROGUELIKE"
+	GenreMetroidvania    Genre = "METROIDVANIA"
 	GenreMOBA            Genre = "MOBA"
-	GenreCasual          Genre = "Casual"
+	GenreCasual          Genre = "CASUAL"
 )
 
 var validGenres = map[Genre]struct{}{
