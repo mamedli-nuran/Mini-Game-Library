@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"mini-game-library/internal/apperror"
 	"mini-game-library/internal/config"
 	"mini-game-library/internal/models"
@@ -65,6 +66,7 @@ func filterGame(r *http.Request, h *GameHandler) (*service.GameFilter, error) {
 	}
 
 	search := r.URL.Query().Get("search")
+	fmt.Println(search)
 
 	filter := service.GameFilter{
 		Genre:       genreParam,

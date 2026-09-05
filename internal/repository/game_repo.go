@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mini-game-library/internal/models"
 	"mini-game-library/internal/service"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -39,8 +40,8 @@ func (r GameRepository) FindGames(ctx context.Context, filter *service.GameFilte
 	}
 
 	if filter.Search != "" {
-		sql += fmt.Sprintf(" AND search = $%d", argsN)
-		args = append(args, filter.Search)
+		sql += fmt.Sprintf(" AND title ILIKE $%d", argsN)
+		args = append(args, escapeLike(filter.Search)+"%")
 		argsN++
 	}
 	rows, err := r.pool.Query(ctx, sql, args...)
@@ -63,4 +64,11 @@ func (r GameRepository) FindGames(ctx context.Context, filter *service.GameFilte
 	}
 
 	return games, nil
+}
+
+func escapeLike(s string) string {
+	s = strings.ReplaceAll(s, `\`, `\\`)
+	s = strings.ReplaceAll(s, `%`, `\%`)
+	s = strings.ReplaceAll(s, `_`, `\_`)
+	return s
 }
