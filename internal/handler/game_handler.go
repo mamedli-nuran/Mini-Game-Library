@@ -2,18 +2,23 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"mini-game-library/internal/apperror"
 	"mini-game-library/internal/config"
+	"mini-game-library/internal/constant"
 	"mini-game-library/internal/dto"
 	"mini-game-library/internal/models"
 	"mini-game-library/internal/service"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 type GameService interface {
 	FindGames(ctx context.Context, filter *service.GameFilter) ([]*models.Game, error)
+	FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error)
 }
 
 type GameHandler struct {
@@ -77,4 +82,30 @@ func (h *GameHandler) parseGameFilter(r *http.Request) (*service.GameFilter, err
 		ReleaseYear: releaseYear,
 		Search:      search,
 	}, nil
+}
+
+func (h *GameHandler) GetGameByID(w http.ResponseWriter, r *http.Request) {
+	gameIDStr := r.PathValue("id")
+	if gameIDStr == "" {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrMissingId)
+		return
+	}
+
+	gameID, err := uuid.Parse(gameIDStr)
+	if err != nil {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrParseId)
+		return
+	}
+	game, err := h.svc.FindGameById(r.Context(), gameID)
+	if err != nil {
+		if errors.Is(err, apperror.ErrGameNotFound) {
+			WriteError(w, r, http.StatusNotFound, err.Error())
+			return
+		}
+		WriteError(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, dto.NewGameResponse(game))
+
 }

@@ -2,11 +2,15 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"mini-game-library/internal/apperror"
 	"mini-game-library/internal/models"
 	"mini-game-library/internal/service"
 	"strings"
 
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -71,4 +75,20 @@ func escapeLike(s string) string {
 	s = strings.ReplaceAll(s, `%`, `\%`)
 	s = strings.ReplaceAll(s, `_`, `\_`)
 	return s
+}
+
+func (r GameRepository) FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error) {
+	sql := `SELECT id, title, description, genre, release_year, created_at FROM games WHERE id=$1`
+
+	var game models.Game
+	err := r.pool.QueryRow(ctx, sql, id).
+		Scan(&game.Id, &game.Title, &game.Description, &game.Genre, &game.ReleaseYear, &game.CreatedAt)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, apperror.ErrGameNotFound
+		}
+		return nil, fmt.Errorf("%w: %w", apperror.ErrGetGame, err)
+	}
+	return &game, nil
 }

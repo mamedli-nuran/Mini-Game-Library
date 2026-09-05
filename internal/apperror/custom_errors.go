@@ -12,4 +12,7 @@ var (
 	ErrUnauthorized        = errors.New("unauthorized")
 	ErrInvalidGenre        = errors.New("invalid genre")
 	ErrInvalidYear         = errors.New("invalid release year, make sure you enter valid year")
+
+	ErrGetGame      = errors.New("failed to get user")
+	ErrGameNotFound = errors.New("game not found")
 )

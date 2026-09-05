@@ -16,4 +16,6 @@ const (
 	ErrUnauthorized       = "User unauthorized"
 	ErrInvalidGenre       = "Invalid genre, please use real genre"
 	ErrInvalidReleaseYear = "Invalid release year, write only digits and valid year"
+	ErrMissingId          = "Missing id parameter"
+	ErrParseId            = "Invalid id parameter, can not parse id"
 )

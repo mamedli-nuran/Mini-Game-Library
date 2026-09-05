@@ -22,5 +22,6 @@ func Setup(
 	// game
 	//todo add pagination
 	mux.HandleFunc("GET /games", gameHandler.GetGames)
+	mux.HandleFunc("GET /games/{id}", gameHandler.GetGameByID)
 	return mux
 }
