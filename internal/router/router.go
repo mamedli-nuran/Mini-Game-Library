@@ -20,6 +20,7 @@ func Setup(
 	mux.HandleFunc("GET /auth/me", middleware.JWTMiddleware(cfg.JWTSecret, userHandler.MeInfo))
 
 	// game
+	//todo add pagination
 	mux.HandleFunc("GET /games", gameHandler.GetGames)
 	return mux
 }

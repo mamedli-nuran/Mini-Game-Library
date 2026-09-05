@@ -29,7 +29,7 @@ func NewGameHandler(svc GameService, cfg config.Config) *GameHandler {
 }
 
 func (h *GameHandler) GetGames(w http.ResponseWriter, r *http.Request) {
-	filter, err := filterGame(r, h)
+	filter, err := h.parseGameFilter(r)
 	if err != nil {
 		WriteError(w, r, http.StatusBadRequest, err.Error())
 		return
@@ -47,7 +47,7 @@ func (h *GameHandler) GetGames(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, response)
 }
 
-func filterGame(r *http.Request, h *GameHandler) (*service.GameFilter, error) {
+func (h *GameHandler) parseGameFilter(r *http.Request) (*service.GameFilter, error) {
 	genreParam := r.URL.Query().Get("genre")
 	if genreParam != "" {
 		genreParam = strings.ToUpper(genreParam)
@@ -72,11 +72,9 @@ func filterGame(r *http.Request, h *GameHandler) (*service.GameFilter, error) {
 
 	search := r.URL.Query().Get("search")
 
-	filter := service.GameFilter{
+	return &service.GameFilter{
 		Genre:       genreParam,
 		ReleaseYear: releaseYear,
 		Search:      search,
-	}
-
-	return &filter, nil
+	}, nil
 }
