@@ -11,4 +11,5 @@ var (
 	ErrLoadingUserId       = errors.New("user id can not be load from application context")
 	ErrUnauthorized        = errors.New("unauthorized")
 	ErrInvalidGenre        = errors.New("invalid genre")
+	ErrInvalidYear         = errors.New("invalid release year, make sure you enter valid year")
 )

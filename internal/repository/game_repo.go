@@ -19,7 +19,7 @@ func NewGameRepository(pool *pgxpool.Pool) *GameRepository {
 	}
 }
 
-func (r GameRepository) FindGames(ctx context.Context, filter service.GameFilter) ([]*models.Game, error) {
+func (r GameRepository) FindGames(ctx context.Context, filter *service.GameFilter) ([]*models.Game, error) {
 	var (
 		sql   = `SELECT id, title, description, genre, release_year, created_at FROM games WHERE TRUE`
 		args  []interface{}

@@ -15,6 +15,7 @@ type Config struct {
 	AccessTokenExpireSeconds time.Duration
 	RefreshTokenExpireHours  time.Duration
 	JWTSecret                string
+	CurrentYear              int
 }
 
 func Load() Config {
@@ -34,12 +35,20 @@ func Load() Config {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	currentYearStr := os.Getenv("CURRENT_YEAR")
+	currentYear, err := strconv.Atoi(currentYearStr)
+	if err != nil {
+		panic(err.Error())
+	}
+
 	slog.Info("Successfully read data from .env file")
 
 	config.DatabaseURL = os.Getenv("DATABASE_URL")
 	config.AccessTokenExpireSeconds = time.Duration(accessExpire) * time.Second
 	config.RefreshTokenExpireHours = time.Duration(refreshExpire) * time.Hour
 	config.JWTSecret = os.Getenv("JWT_SECRET")
+	config.CurrentYear = currentYear
 
 	return config
 }

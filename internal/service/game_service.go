@@ -6,7 +6,7 @@ import (
 )
 
 type GameRepository interface {
-	FindGames(ctx context.Context, filter GameFilter) ([]*models.Game, error)
+	FindGames(ctx context.Context, filter *GameFilter) ([]*models.Game, error)
 }
 
 type GameService struct {
@@ -25,7 +25,7 @@ type GameFilter struct {
 	Search      string
 }
 
-func (s *GameService) FindGames(ctx context.Context, filter GameFilter) ([]*models.Game, error) {
+func (s *GameService) FindGames(ctx context.Context, filter *GameFilter) ([]*models.Game, error) {
 	games, err := s.repo.FindGames(ctx, filter)
 	if err != nil {
 		return nil, err
