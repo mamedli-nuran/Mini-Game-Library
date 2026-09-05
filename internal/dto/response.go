@@ -48,3 +48,21 @@ func NewUserResponse(user *models.User) UserResponse {
 		UpdatedAt: user.UpdatedAt,
 	}
 }
+
+type GameResponse struct {
+	Id          uuid.UUID    `json:"id"`
+	Title       string       `json:"title"`
+	Description string       `json:"description"`
+	Genre       models.Genre `json:"genre"`
+	ReleaseYear int          `json:"release_year"`
+}
+
+func NewGameResponse(game *models.Game) GameResponse {
+	return GameResponse{
+		Id:          game.Id,
+		Title:       game.Title,
+		Description: game.Description,
+		Genre:       game.Genre,
+		ReleaseYear: game.ReleaseYear,
+	}
+}

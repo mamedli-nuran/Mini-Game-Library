@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"mini-game-library/internal/apperror"
 	"mini-game-library/internal/config"
+	"mini-game-library/internal/dto"
 	"mini-game-library/internal/models"
 	"mini-game-library/internal/service"
 	"net/http"
@@ -39,7 +39,12 @@ func (h *GameHandler) GetGames(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, games)
+	var response []dto.GameResponse
+	for _, game := range games {
+		response = append(response, dto.NewGameResponse(game))
+	}
+
+	writeJSON(w, http.StatusOK, response)
 }
 
 func filterGame(r *http.Request, h *GameHandler) (*service.GameFilter, error) {
@@ -66,7 +71,6 @@ func filterGame(r *http.Request, h *GameHandler) (*service.GameFilter, error) {
 	}
 
 	search := r.URL.Query().Get("search")
-	fmt.Println(search)
 
 	filter := service.GameFilter{
 		Genre:       genreParam,
