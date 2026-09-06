@@ -8,7 +8,7 @@ import (
 )
 
 type GameRepository interface {
-	FindGames(ctx context.Context, filter *GameFilter) ([]*models.Game, error)
+	FindGames(ctx context.Context, filter *GameFilter) ([]*models.Game, int, error)
 	FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error)
 }
 
@@ -26,15 +26,17 @@ type GameFilter struct {
 	Genre       string
 	ReleaseYear int
 	Search      string
+	Page        int
+	Limit       int
 }
 
-func (s *GameService) FindGames(ctx context.Context, filter *GameFilter) ([]*models.Game, error) {
-	games, err := s.repo.FindGames(ctx, filter)
+func (s *GameService) FindGames(ctx context.Context, filter *GameFilter) ([]*models.Game, int, error) {
+	games, total, err := s.repo.FindGames(ctx, filter)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return games, nil
+	return games, total, nil
 }
 
 func (s *GameService) FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error) {

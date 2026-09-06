@@ -17,7 +17,7 @@ import (
 )
 
 type GameService interface {
-	FindGames(ctx context.Context, filter *service.GameFilter) ([]*models.Game, error)
+	FindGames(ctx context.Context, filter *service.GameFilter) ([]*models.Game, int, error)
 	FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error)
 }
 
@@ -39,15 +39,12 @@ func (h *GameHandler) GetGames(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	games, err := h.svc.FindGames(r.Context(), filter)
+	games, total, err := h.svc.FindGames(r.Context(), filter)
 	if err != nil {
 		return
 	}
 
-	var response []dto.GameResponse
-	for _, game := range games {
-		response = append(response, dto.NewGameResponse(game))
-	}
+	response := dto.NewGamesResponse(games, total)
 
 	writeJSON(w, http.StatusOK, response)
 }
@@ -77,10 +74,31 @@ func (h *GameHandler) parseGameFilter(r *http.Request) (*service.GameFilter, err
 
 	search := r.URL.Query().Get("search")
 
+	pageStr := r.URL.Query().Get("page")
+	page := 1
+	if pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	limitStr := r.URL.Query().Get("limit")
+	limit := 10
+	if limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+	if limit > 10 {
+		limit = 10
+	}
+
 	return &service.GameFilter{
 		Genre:       genreParam,
 		ReleaseYear: releaseYear,
 		Search:      search,
+		Page:        page,
+		Limit:       limit,
 	}, nil
 }
 

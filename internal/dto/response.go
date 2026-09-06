@@ -66,3 +66,28 @@ func NewGameResponse(game *models.Game) GameResponse {
 		ReleaseYear: game.ReleaseYear,
 	}
 }
+
+type MetaResponse struct {
+	Total int `json:"total"`
+}
+
+type GamesResponse struct {
+	Data []GameResponse `json:"data"`
+	Meta MetaResponse   `json:"meta"`
+}
+
+func NewGamesResponse(games []*models.Game, total int) GamesResponse {
+	var data []GameResponse
+	for _, game := range games {
+		data = append(data, NewGameResponse(game))
+	}
+	if data == nil {
+		data = make([]GameResponse, 0)
+	}
+	return GamesResponse{
+		Data: data,
+		Meta: MetaResponse{
+			Total: total,
+		},
+	}
+}
