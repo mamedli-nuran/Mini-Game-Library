@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"mini-game-library/internal/dto"
 	"mini-game-library/internal/models"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -11,6 +13,7 @@ type GameRepository interface {
 	FindGames(ctx context.Context, filter *GameFilter) ([]*models.Game, int, error)
 	FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error)
 	CreateGame(ctx context.Context, game *models.Game) error
+	UpdateGame(ctx context.Context, game *models.Game) error
 }
 
 type GameService struct {
@@ -49,16 +52,43 @@ func (s *GameService) FindGameById(ctx context.Context, id uuid.UUID) (*models.G
 	return game, nil
 }
 
-func (s *GameService) CreateGame(ctx context.Context, title, description, genre string, releaseYear int) (*models.Game, error) {
+func (s *GameService) CreateGame(ctx context.Context, req dto.CreateGameRequest) (*models.Game, error) {
 	game := &models.Game{
 		Id:          uuid.New(),
-		Title:       title,
-		Description: description,
-		Genre:       models.Genre(genre),
-		ReleaseYear: releaseYear,
+		Title:       req.Title,
+		Description: req.Description,
+		Genre:       models.Genre(req.Genre),
+		ReleaseYear: req.ReleaseYear,
 	}
 
 	err := s.repo.CreateGame(ctx, game)
+	if err != nil {
+		return nil, err
+	}
+
+	return game, nil
+}
+
+func (s *GameService) UpdateGame(ctx context.Context, id uuid.UUID, req dto.UpdateGameRequest) (*models.Game, error) {
+	game, err := s.repo.FindGameById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Title != nil {
+		game.Title = *req.Title
+	}
+	if req.Description != nil {
+		game.Description = *req.Description
+	}
+	if req.Genre != nil {
+		game.Genre = models.Genre(strings.ToUpper(*req.Genre))
+	}
+	if req.ReleaseYear != nil {
+		game.ReleaseYear = *req.ReleaseYear
+	}
+
+	err = s.repo.UpdateGame(ctx, game)
 	if err != nil {
 		return nil, err
 	}

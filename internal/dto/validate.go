@@ -62,3 +62,36 @@ func (r *CreateGameRequest) Validate() []ErrorDetail {
 
 	return errors
 }
+
+func (r *UpdateGameRequest) Validate() []ErrorDetail {
+	var errors []ErrorDetail
+
+	if r.Title != nil {
+		titleLen := len(*r.Title)
+		if titleLen < 2 || titleLen > 100 {
+			errors = append(errors, ErrorDetail{Field: "title", Message: constant.ErrTitleLength})
+		}
+	}
+
+	if r.Description != nil {
+		descLen := len(*r.Description)
+		if descLen < 10 || descLen > 1000 {
+			errors = append(errors, ErrorDetail{Field: "description", Message: constant.ErrDescriptionLength})
+		}
+	}
+
+	if r.Genre != nil {
+		genre := models.Genre(strings.ToUpper(*r.Genre))
+		if err := genre.Validate(); err != nil {
+			errors = append(errors, ErrorDetail{Field: "genre", Message: constant.ErrInvalidGenre})
+		}
+	}
+
+	if r.ReleaseYear != nil {
+		if *r.ReleaseYear < 1900 || *r.ReleaseYear > 2100 {
+			errors = append(errors, ErrorDetail{Field: "release_year", Message: constant.ErrInvalidReleaseYear})
+		}
+	}
+
+	return errors
+}

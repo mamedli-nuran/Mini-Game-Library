@@ -17,3 +17,10 @@ type CreateGameRequest struct {
 	Genre       string `json:"genre"`
 	ReleaseYear int    `json:"release_year"`
 }
+
+type UpdateGameRequest struct {
+	Title       *string `json:"title,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Genre       *string `json:"genre,omitempty"`
+	ReleaseYear *int    `json:"release_year,omitempty"`
+}

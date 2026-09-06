@@ -18,3 +18,15 @@ func (r *CreateGameRequest) Sanitize() {
 	r.Description = strings.TrimSpace(r.Description)
 	r.Genre = strings.TrimSpace(r.Genre)
 }
+
+func (r *UpdateGameRequest) Sanitize() {
+	if r.Title != nil {
+		*r.Title = strings.TrimSpace(*r.Title)
+	}
+	if r.Description != nil {
+		*r.Description = strings.TrimSpace(*r.Description)
+	}
+	if r.Genre != nil {
+		*r.Genre = strings.TrimSpace(*r.Genre)
+	}
+}

@@ -20,7 +20,8 @@ import (
 type GameService interface {
 	FindGames(ctx context.Context, filter *service.GameFilter) ([]*models.Game, int, error)
 	FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error)
-	CreateGame(ctx context.Context, title, description, genre string, releaseYear int) (*models.Game, error)
+	CreateGame(ctx context.Context, req dto.CreateGameRequest) (*models.Game, error)
+	UpdateGame(ctx context.Context, id uuid.UUID, req dto.UpdateGameRequest) (*models.Game, error)
 }
 
 type GameHandler struct {
@@ -147,7 +148,7 @@ func (h *GameHandler) CreateGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	game, err := h.svc.CreateGame(r.Context(), req.Title, req.Description, req.Genre, req.ReleaseYear)
+	game, err := h.svc.CreateGame(r.Context(), req)
 	if err != nil {
 		if errors.Is(err, apperror.ErrGameDuplicate) {
 			WriteError(w, r, http.StatusConflict, err.Error())
@@ -158,4 +159,44 @@ func (h *GameHandler) CreateGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusCreated, dto.NewGameResponse(game))
+}
+
+func (h *GameHandler) UpdateGame(w http.ResponseWriter, r *http.Request) {
+	gameIDStr := r.PathValue("id")
+	if gameIDStr == "" {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrMissingId)
+		return
+	}
+
+	gameID, err := uuid.Parse(gameIDStr)
+	if err != nil {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrParseId)
+		return
+	}
+
+	var req dto.UpdateGameRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrInvalidBody)
+		return
+	}
+	req.Sanitize()
+
+	if errs := req.Validate(); len(errs) > 0 {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrValidationFailed, errs...)
+		return
+	}
+
+	game, err := h.svc.UpdateGame(r.Context(), gameID, req)
+	if err != nil {
+		if errors.Is(err, apperror.ErrGameNotFound) {
+			WriteError(w, r, http.StatusNotFound, err.Error())
+		} else if errors.Is(err, apperror.ErrGameDuplicate) {
+			WriteError(w, r, http.StatusConflict, err.Error())
+		} else {
+			WriteError(w, r, http.StatusInternalServerError, constant.ErrInternalServerError)
+		}
+		return
+	}
+
+	writeJSON(w, http.StatusOK, dto.NewGameResponse(game))
 }

@@ -119,3 +119,17 @@ func (r GameRepository) CreateGame(ctx context.Context, game *models.Game) error
 	}
 	return nil
 }
+
+func (r GameRepository) UpdateGame(ctx context.Context, game *models.Game) error {
+	sql := `UPDATE games SET title=$1, description=$2, genre=$3, release_year=$4 WHERE id=$5`
+	_, err := r.pool.Exec(ctx, sql, game.Title, game.Description, game.Genre, game.ReleaseYear, game.Id)
+	if err != nil {
+		if pgErr, ok := errors.AsType[*pgconn.PgError](err); ok {
+			if pgErr.Code == "23505" {
+				return apperror.ErrGameDuplicate
+			}
+		}
+		return fmt.Errorf("failed to update game: %w", err)
+	}
+	return nil
+}
