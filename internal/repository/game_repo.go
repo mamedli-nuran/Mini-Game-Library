@@ -11,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -103,4 +104,18 @@ func (r GameRepository) FindGameById(ctx context.Context, id uuid.UUID) (*models
 		return nil, fmt.Errorf("%w: %w", apperror.ErrGetGame, err)
 	}
 	return &game, nil
+}
+
+func (r GameRepository) CreateGame(ctx context.Context, game *models.Game) error {
+	sql := `INSERT INTO games (id, title, description, genre, release_year) VALUES ($1, $2, $3, $4, $5) RETURNING created_at`
+	err := r.pool.QueryRow(ctx, sql, game.Id, game.Title, game.Description, game.Genre, game.ReleaseYear).Scan(&game.CreatedAt)
+	if err != nil {
+		if pgErr, ok := errors.AsType[*pgconn.PgError](err); ok {
+			if pgErr.Code == "23505" {
+				return apperror.ErrGameDuplicate
+			}
+		}
+		return fmt.Errorf("failed to create game: %w", err)
+	}
+	return nil
 }

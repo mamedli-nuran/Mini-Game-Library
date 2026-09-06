@@ -22,5 +22,6 @@ func Setup(
 	// game
 	mux.HandleFunc("GET /games", gameHandler.GetGames)
 	mux.HandleFunc("GET /games/{id}", gameHandler.GetGameByID)
+	mux.HandleFunc("POST /games", middleware.JWTMiddleware(cfg.JWTSecret, gameHandler.CreateGame))
 	return mux
 }

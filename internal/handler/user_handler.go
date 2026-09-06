@@ -36,7 +36,7 @@ func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	req.Sanitize()
 	if errorDetails := req.Validate(); len(errorDetails) > 0 {
-		WriteError(w, r, http.StatusUnprocessableEntity, constant.ErrValidationFailed, errorDetails...)
+		WriteError(w, r, http.StatusBadRequest, constant.ErrValidationFailed, errorDetails...)
 		return
 	}
 
@@ -63,14 +63,14 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	req.Sanitize()
 	if errorDetails := req.Validate(); len(errorDetails) > 0 {
-		WriteError(w, r, http.StatusUnprocessableEntity, constant.ErrValidationFailed, errorDetails...)
+		WriteError(w, r, http.StatusBadRequest, constant.ErrValidationFailed, errorDetails...)
 		return
 	}
 
 	tokens, err := h.svc.LoginUser(r.Context(), req)
 	if err != nil {
 		if errors.Is(err, apperror.ErrUserFind) || errors.Is(err, apperror.ErrInvalidCredentials) {
-			WriteError(w, r, http.StatusUnprocessableEntity, err.Error())
+			WriteError(w, r, http.StatusBadRequest, err.Error())
 		} else {
 			WriteError(w, r, http.StatusInternalServerError, apperror.ErrInternalServerError)
 		}

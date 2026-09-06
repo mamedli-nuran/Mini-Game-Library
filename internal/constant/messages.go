@@ -18,4 +18,7 @@ const (
 	ErrInvalidReleaseYear = "Invalid release year, write only digits and valid year"
 	ErrMissingId          = "Missing id parameter"
 	ErrParseId            = "Invalid id parameter, can not parse id"
+
+	ErrTitleLength       = "Title must be between 2 and 100 characters"
+	ErrDescriptionLength = "Description must be between 10 and 1000 characters"
 )

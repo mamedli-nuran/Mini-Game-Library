@@ -2,7 +2,9 @@ package dto
 
 import (
 	"mini-game-library/internal/constant"
+	"mini-game-library/internal/models"
 	"net/mail"
+	"strings"
 )
 
 func (r *RegisterRequest) Validate() []ErrorDetail {
@@ -31,6 +33,31 @@ func (r *LoginRequest) Validate() []ErrorDetail {
 
 	if r.Identifier == "" {
 		errors = append(errors, ErrorDetail{Field: "identifier", Message: "safsafas"})
+	}
+
+	return errors
+}
+
+func (r *CreateGameRequest) Validate() []ErrorDetail {
+	var errors []ErrorDetail
+
+	titleLen := len(r.Title)
+	if titleLen < 2 || titleLen > 100 {
+		errors = append(errors, ErrorDetail{Field: "title", Message: constant.ErrTitleLength})
+	}
+
+	descLen := len(r.Description)
+	if descLen < 10 || descLen > 1000 {
+		errors = append(errors, ErrorDetail{Field: "description", Message: constant.ErrDescriptionLength})
+	}
+
+	genre := models.Genre(strings.ToUpper(r.Genre))
+	if err := genre.Validate(); err != nil {
+		errors = append(errors, ErrorDetail{Field: "genre", Message: constant.ErrInvalidGenre})
+	}
+
+	if r.ReleaseYear < 1900 || r.ReleaseYear > 2100 {
+		errors = append(errors, ErrorDetail{Field: "release_year", Message: constant.ErrInvalidReleaseYear})
 	}
 
 	return errors

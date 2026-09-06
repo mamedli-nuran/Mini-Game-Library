@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"mini-game-library/internal/apperror"
 	"mini-game-library/internal/config"
@@ -19,6 +20,7 @@ import (
 type GameService interface {
 	FindGames(ctx context.Context, filter *service.GameFilter) ([]*models.Game, int, error)
 	FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error)
+	CreateGame(ctx context.Context, title, description, genre string, releaseYear int) (*models.Game, error)
 }
 
 type GameHandler struct {
@@ -130,4 +132,30 @@ func (h *GameHandler) GetGameByID(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusOK, dto.NewGameResponse(game))
 
+}
+
+func (h *GameHandler) CreateGame(w http.ResponseWriter, r *http.Request) {
+	var req dto.CreateGameRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrInvalidBody)
+		return
+	}
+	req.Sanitize()
+
+	if errs := req.Validate(); len(errs) > 0 {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrValidationFailed, errs...)
+		return
+	}
+
+	game, err := h.svc.CreateGame(r.Context(), req.Title, req.Description, req.Genre, req.ReleaseYear)
+	if err != nil {
+		if errors.Is(err, apperror.ErrGameDuplicate) {
+			WriteError(w, r, http.StatusConflict, err.Error())
+		} else {
+			WriteError(w, r, http.StatusInternalServerError, constant.ErrInternalServerError)
+		}
+		return
+	}
+
+	writeJSON(w, http.StatusCreated, dto.NewGameResponse(game))
 }

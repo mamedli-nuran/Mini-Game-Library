@@ -10,3 +10,10 @@ type LoginRequest struct {
 	Identifier string `json:"identifier"`
 	Password   string `json:"password"`
 }
+
+type CreateGameRequest struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Genre       string `json:"genre"`
+	ReleaseYear int    `json:"release_year"`
+}

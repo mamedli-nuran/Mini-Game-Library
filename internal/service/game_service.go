@@ -10,6 +10,7 @@ import (
 type GameRepository interface {
 	FindGames(ctx context.Context, filter *GameFilter) ([]*models.Game, int, error)
 	FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error)
+	CreateGame(ctx context.Context, game *models.Game) error
 }
 
 type GameService struct {
@@ -41,6 +42,23 @@ func (s *GameService) FindGames(ctx context.Context, filter *GameFilter) ([]*mod
 
 func (s *GameService) FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error) {
 	game, err := s.repo.FindGameById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return game, nil
+}
+
+func (s *GameService) CreateGame(ctx context.Context, title, description, genre string, releaseYear int) (*models.Game, error) {
+	game := &models.Game{
+		Id:          uuid.New(),
+		Title:       title,
+		Description: description,
+		Genre:       models.Genre(genre),
+		ReleaseYear: releaseYear,
+	}
+
+	err := s.repo.CreateGame(ctx, game)
 	if err != nil {
 		return nil, err
 	}
