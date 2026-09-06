@@ -45,7 +45,7 @@ func (r GameRepository) FindGames(ctx context.Context, filter *service.GameFilte
 
 	if filter.Search != "" {
 		baseSQL += fmt.Sprintf(" AND title ILIKE $%d", argsN)
-		args = append(args, escapeLike(filter.Search)+"%")
+		args = append(args, "%"+escapeLike(filter.Search)+"%")
 		argsN++
 	}
 
