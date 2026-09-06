@@ -22,6 +22,7 @@ type GameService interface {
 	FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error)
 	CreateGame(ctx context.Context, req dto.CreateGameRequest) (*models.Game, error)
 	UpdateGame(ctx context.Context, id uuid.UUID, req dto.UpdateGameRequest) (*models.Game, error)
+	DeleteGame(ctx context.Context, id uuid.UUID) error
 }
 
 type GameHandler struct {
@@ -199,4 +200,30 @@ func (h *GameHandler) UpdateGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, dto.NewGameResponse(game))
+}
+
+func (h *GameHandler) DeleteGame(w http.ResponseWriter, r *http.Request) {
+	gameIDStr := r.PathValue("id")
+	if gameIDStr == "" {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrMissingId)
+		return
+	}
+
+	gameID, err := uuid.Parse(gameIDStr)
+	if err != nil {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrParseId)
+		return
+	}
+
+	err = h.svc.DeleteGame(r.Context(), gameID)
+	if err != nil {
+		if errors.Is(err, apperror.ErrGameNotFound) {
+			WriteError(w, r, http.StatusNotFound, err.Error())
+		} else {
+			WriteError(w, r, http.StatusInternalServerError, constant.ErrInternalServerError)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

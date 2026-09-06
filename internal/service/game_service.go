@@ -14,6 +14,7 @@ type GameRepository interface {
 	FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error)
 	CreateGame(ctx context.Context, game *models.Game) error
 	UpdateGame(ctx context.Context, game *models.Game) error
+	DeleteGame(ctx context.Context, id uuid.UUID) error
 }
 
 type GameService struct {
@@ -94,4 +95,8 @@ func (s *GameService) UpdateGame(ctx context.Context, id uuid.UUID, req dto.Upda
 	}
 
 	return game, nil
+}
+
+func (s *GameService) DeleteGame(ctx context.Context, id uuid.UUID) error {
+	return s.repo.DeleteGame(ctx, id)
 }

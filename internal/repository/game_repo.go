@@ -133,3 +133,16 @@ func (r GameRepository) UpdateGame(ctx context.Context, game *models.Game) error
 	}
 	return nil
 }
+
+func (r GameRepository) DeleteGame(ctx context.Context, id uuid.UUID) error {
+	sql := `DELETE FROM games WHERE id=$1`
+	commandTag, err := r.pool.Exec(ctx, sql, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete game: %w", err)
+	}
+
+	if commandTag.RowsAffected() == 0 {
+		return apperror.ErrGameNotFound
+	}
+	return nil
+}

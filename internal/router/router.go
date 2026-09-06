@@ -24,5 +24,6 @@ func Setup(
 	mux.HandleFunc("GET /games/{id}", gameHandler.GetGameByID)
 	mux.HandleFunc("POST /games", middleware.JWTMiddleware(cfg.JWTSecret, gameHandler.CreateGame))
 	mux.HandleFunc("PATCH /games/{id}", middleware.JWTMiddleware(cfg.JWTSecret, gameHandler.UpdateGame))
+	mux.HandleFunc("DELETE /games/{id}", middleware.JWTMiddleware(cfg.JWTSecret, gameHandler.DeleteGame))
 	return mux
 }
