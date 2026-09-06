@@ -19,6 +19,8 @@ const (
 	ErrMissingId          = "Missing id parameter"
 	ErrParseId            = "Invalid id parameter, can not parse id"
 
-	ErrTitleLength       = "Title must be between 2 and 100 characters"
-	ErrDescriptionLength = "Description must be between 10 and 1000 characters"
+	ErrTitleLength        = "Title must be between 2 and 100 characters"
+	ErrDescriptionLength  = "Description must be between 10 and 1000 characters"
+	ErrIdentifierRequired = "Identifier (email or username) is required"
+	ErrIdentifierLength   = "Identifier must be at least 4 characters long"
 )

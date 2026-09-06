@@ -27,12 +27,17 @@ func (r *RegisterRequest) Validate() []ErrorDetail {
 	return errors
 }
 
-// todo make normal validation
 func (r *LoginRequest) Validate() []ErrorDetail {
 	var errors []ErrorDetail
 
 	if r.Identifier == "" {
-		errors = append(errors, ErrorDetail{Field: "identifier", Message: "safsafas"})
+		errors = append(errors, ErrorDetail{Field: "identifier", Message: constant.ErrIdentifierRequired})
+	} else if len(r.Identifier) < 4 {
+		errors = append(errors, ErrorDetail{Field: "identifier", Message: constant.ErrIdentifierLength})
+	}
+
+	if passwordLen := len(r.Password); passwordLen < 12 || passwordLen > 25 {
+		errors = append(errors, ErrorDetail{Field: "password", Message: constant.ErrPasswordLength})
 	}
 
 	return errors
