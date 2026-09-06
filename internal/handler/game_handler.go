@@ -77,20 +77,24 @@ func (h *GameHandler) parseGameFilter(r *http.Request) (*service.GameFilter, err
 	pageStr := r.URL.Query().Get("page")
 	page := 1
 	if pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
+		p, err := strconv.Atoi(pageStr)
+		if err != nil || p <= 0 {
+			return nil, apperror.ErrInvalidPage
 		}
+		page = p
 	}
 
 	limitStr := r.URL.Query().Get("limit")
 	limit := 10
 	if limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
-			limit = l
+		l, err := strconv.Atoi(limitStr)
+		if err != nil || l <= 0 {
+			return nil, apperror.ErrInvalidLimit
 		}
+		limit = l
 	}
-	if limit > 10 {
-		limit = 10
+	if limit > 20 {
+		limit = 20
 	}
 
 	return &service.GameFilter{
