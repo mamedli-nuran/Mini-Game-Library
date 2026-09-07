@@ -2,14 +2,14 @@ package router
 
 import (
 	"mini-game-library/internal/config"
-	handler2 "mini-game-library/internal/handler"
+	"mini-game-library/internal/handler"
 	"mini-game-library/internal/middleware"
 	"net/http"
 )
 
 func Setup(
-	userHandler *handler2.UserHandler,
-	gameHandler *handler2.GameHandler,
+	userHandler *handler.UserHandler,
+	gameHandler *handler.GameHandler,
 	cfg config.Config,
 ) *http.ServeMux {
 	mux := http.NewServeMux()
