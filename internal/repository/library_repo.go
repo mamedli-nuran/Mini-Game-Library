@@ -2,9 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"mini-game-library/internal/apperror"
 	"mini-game-library/internal/models"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -37,4 +41,21 @@ func (r *LibraryRepository) GetUserLibrary(ctx context.Context, userID uuid.UUID
 		return nil, err
 	}
 	return items, nil
+}
+
+func (r *LibraryRepository) AddToLibrary(ctx context.Context, item *models.LibraryItem) error {
+	sql := `INSERT INTO library_items (id, user_id, game_id, status) VALUES ($1, $2, $3, $4) RETURNING added_at`
+	err := r.pool.QueryRow(ctx, sql, item.Id, item.UserId, item.GameId, item.Status).Scan(&item.AddedAt)
+	if err != nil {
+		if pgErr, ok := errors.AsType[*pgconn.PgError](err); ok {
+			if pgErr.Code == "23505" {
+				return apperror.ErrLibraryDuplicate
+			}
+			if pgErr.Code == "23503" {
+				return apperror.ErrGameNotFound
+			}
+		}
+		return fmt.Errorf("failed to add to library: %w", err)
+	}
+	return nil
 }

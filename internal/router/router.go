@@ -30,6 +30,7 @@ func Setup(
 
 	// library
 	mux.HandleFunc("GET /me/library", middleware.JWTMiddleware(cfg.JWTSecret, libraryHandler.GetLibrary))
+	mux.HandleFunc("POST /me/library", middleware.JWTMiddleware(cfg.JWTSecret, libraryHandler.AddToLibrary))
 
 	return mux
 }

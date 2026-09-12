@@ -24,3 +24,8 @@ type UpdateGameRequest struct {
 	Genre       *string `json:"genre,omitempty"`
 	ReleaseYear *int    `json:"release_year,omitempty"`
 }
+
+type AddToLibraryRequest struct {
+	GameId string `json:"game_id"`
+	Status string `json:"status"`
+}

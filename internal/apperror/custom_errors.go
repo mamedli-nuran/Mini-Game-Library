@@ -15,7 +15,8 @@ var (
 	ErrInvalidPage         = errors.New("invalid page parameter")
 	ErrInvalidLimit        = errors.New("invalid limit parameter")
 
-	ErrGetGame       = errors.New("failed to get user")
-	ErrGameNotFound  = errors.New("game not found")
-	ErrGameDuplicate = errors.New("game with this title already exists")
+	ErrGetGame          = errors.New("failed to get user")
+	ErrGameNotFound     = errors.New("game not found")
+	ErrGameDuplicate    = errors.New("game with this title already exists")
+	ErrLibraryDuplicate = errors.New("game already exists in library")
 )

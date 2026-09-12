@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"mini-game-library/internal/apperror"
 	"mini-game-library/internal/constant"
 	"mini-game-library/internal/dto"
 	"mini-game-library/internal/models"
@@ -12,6 +15,7 @@ import (
 
 type LibraryService interface {
 	GetUserLibrary(ctx context.Context, userID uuid.UUID) ([]*models.LibraryItem, error)
+	AddToLibrary(ctx context.Context, userID uuid.UUID, req dto.AddToLibraryRequest) (*models.LibraryItem, error)
 }
 
 type LibraryHandler struct {
@@ -41,4 +45,39 @@ func (h *LibraryHandler) GetLibrary(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, res)
+}
+
+func (h *LibraryHandler) AddToLibrary(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(constant.UserIDKey).(uuid.UUID)
+	if !ok {
+		WriteError(w, r, http.StatusUnauthorized, constant.ErrUnauthorized)
+		return
+	}
+
+	var req dto.AddToLibraryRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrInvalidBody)
+		return
+	}
+
+	if errs := req.Validate(); len(errs) > 0 {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrValidationFailed, errs...)
+		return
+	}
+
+	item, err := h.svc.AddToLibrary(r.Context(), userID, req)
+	if err != nil {
+		if errors.Is(err, apperror.ErrLibraryDuplicate) {
+			WriteError(w, r, http.StatusConflict, apperror.ErrLibraryDuplicate.Error())
+			return
+		}
+		if errors.Is(err, apperror.ErrGameNotFound) {
+			WriteError(w, r, http.StatusNotFound, apperror.ErrGameNotFound.Error())
+			return
+		}
+		WriteError(w, r, http.StatusInternalServerError, constant.ErrInternalServerError)
+		return
+	}
+
+	writeJSON(w, http.StatusCreated, dto.NewLibraryItemResponse(item))
 }

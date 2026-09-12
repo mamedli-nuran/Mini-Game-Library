@@ -5,6 +5,8 @@ import (
 	"mini-game-library/internal/models"
 	"net/mail"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 func (r *RegisterRequest) Validate() []ErrorDetail {
@@ -96,6 +98,23 @@ func (r *UpdateGameRequest) Validate() []ErrorDetail {
 		if *r.ReleaseYear < 1900 || *r.ReleaseYear > 2100 {
 			errors = append(errors, ErrorDetail{Field: "release_year", Message: constant.ErrInvalidReleaseYear})
 		}
+	}
+
+	return errors
+}
+
+func (r *AddToLibraryRequest) Validate() []ErrorDetail {
+	var errors []ErrorDetail
+
+	if r.GameId == "" {
+		errors = append(errors, ErrorDetail{Field: "game_id", Message: constant.ErrMissingId})
+	} else if _, err := uuid.Parse(r.GameId); err != nil {
+		errors = append(errors, ErrorDetail{Field: "game_id", Message: "Invalid UUID format"})
+	}
+
+	status := models.LibraryStatus(strings.ToUpper(r.Status))
+	if err := status.Validate(); err != nil {
+		errors = append(errors, ErrorDetail{Field: "status", Message: "Invalid status. Use WISHLIST, PLAYING, or COMPLETED"})
 	}
 
 	return errors
