@@ -8,6 +8,7 @@ import (
 	"mini-game-library/internal/models"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -58,4 +59,17 @@ func (r *LibraryRepository) AddToLibrary(ctx context.Context, item *models.Libra
 		return fmt.Errorf("failed to add to library: %w", err)
 	}
 	return nil
+}
+
+func (r *LibraryRepository) UpdateLibraryStatus(ctx context.Context, userID, gameID uuid.UUID, status models.LibraryStatus) (*models.LibraryItem, error) {
+	sql := `UPDATE library_items SET status = $1 WHERE user_id = $2 AND game_id = $3 RETURNING id, user_id, game_id, status, added_at`
+	var item models.LibraryItem
+	err := r.pool.QueryRow(ctx, sql, status, userID, gameID).Scan(&item.Id, &item.UserId, &item.GameId, &item.Status, &item.AddedAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, apperror.ErrLibraryNotFound
+		}
+		return nil, fmt.Errorf("failed to update library status: %w", err)
+	}
+	return &item, nil
 }

@@ -30,3 +30,7 @@ func (r *UpdateGameRequest) Sanitize() {
 		*r.Genre = strings.TrimSpace(*r.Genre)
 	}
 }
+
+func (r *UpdateLibraryStatusRequest) Sanitize() {
+	r.Status = strings.ToUpper(strings.TrimSpace(r.Status))
+}

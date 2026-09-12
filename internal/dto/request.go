@@ -29,3 +29,7 @@ type AddToLibraryRequest struct {
 	GameId string `json:"game_id"`
 	Status string `json:"status"`
 }
+
+type UpdateLibraryStatusRequest struct {
+	Status string `json:"status"`
+}

@@ -19,4 +19,5 @@ var (
 	ErrGameNotFound     = errors.New("game not found")
 	ErrGameDuplicate    = errors.New("game with this title already exists")
 	ErrLibraryDuplicate = errors.New("game already exists in library")
+	ErrLibraryNotFound  = errors.New("game not found in library")
 )

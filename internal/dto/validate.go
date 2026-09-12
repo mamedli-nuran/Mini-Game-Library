@@ -119,3 +119,14 @@ func (r *AddToLibraryRequest) Validate() []ErrorDetail {
 
 	return errors
 }
+
+func (r *UpdateLibraryStatusRequest) Validate() []ErrorDetail {
+	var errors []ErrorDetail
+
+	status := models.LibraryStatus(strings.ToUpper(r.Status))
+	if err := status.Validate(); err != nil {
+		errors = append(errors, ErrorDetail{Field: "status", Message: "Invalid status. Use WISHLIST, PLAYING, or COMPLETED"})
+	}
+
+	return errors
+}

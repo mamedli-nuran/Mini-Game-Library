@@ -16,6 +16,7 @@ import (
 type LibraryService interface {
 	GetUserLibrary(ctx context.Context, userID uuid.UUID) ([]*models.LibraryItem, error)
 	AddToLibrary(ctx context.Context, userID uuid.UUID, req dto.AddToLibraryRequest) (*models.LibraryItem, error)
+	UpdateLibraryStatus(ctx context.Context, userID, gameID uuid.UUID, req dto.UpdateLibraryStatusRequest) (*models.LibraryItem, error)
 }
 
 type LibraryHandler struct {
@@ -80,4 +81,48 @@ func (h *LibraryHandler) AddToLibrary(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusCreated, dto.NewLibraryItemResponse(item))
+}
+
+func (h *LibraryHandler) UpdateLibraryStatus(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(constant.UserIDKey).(uuid.UUID)
+	if !ok {
+		WriteError(w, r, http.StatusUnauthorized, constant.ErrUnauthorized)
+		return
+	}
+
+	gameIDStr := r.PathValue("gameId")
+	if gameIDStr == "" {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrMissingId)
+		return
+	}
+
+	gameID, err := uuid.Parse(gameIDStr)
+	if err != nil {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrParseId)
+		return
+	}
+
+	var req dto.UpdateLibraryStatusRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrInvalidBody)
+		return
+	}
+	req.Sanitize()
+
+	if errs := req.Validate(); len(errs) > 0 {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrValidationFailed, errs...)
+		return
+	}
+
+	item, err := h.svc.UpdateLibraryStatus(r.Context(), userID, gameID, req)
+	if err != nil {
+		if errors.Is(err, apperror.ErrLibraryNotFound) {
+			WriteError(w, r, http.StatusNotFound, apperror.ErrLibraryNotFound.Error())
+			return
+		}
+		WriteError(w, r, http.StatusInternalServerError, constant.ErrInternalServerError)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, dto.NewLibraryItemResponse(item))
 }
