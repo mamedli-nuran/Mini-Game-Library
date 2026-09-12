@@ -7,7 +7,7 @@ import (
 	"mini-game-library/internal/apperror"
 	"mini-game-library/internal/config"
 	"mini-game-library/internal/constant"
-	dto2 "mini-game-library/internal/dto"
+	"mini-game-library/internal/dto"
 	"mini-game-library/internal/models"
 	"mini-game-library/internal/service"
 	"net/http"
@@ -15,8 +15,8 @@ import (
 )
 
 type UserService interface {
-	RegisterUser(ctx context.Context, request dto2.RegisterRequest) (*models.User, error)
-	LoginUser(ctx context.Context, request dto2.LoginRequest) (*service.TokenPair, error)
+	RegisterUser(ctx context.Context, request dto.RegisterRequest) (*models.User, error)
+	LoginUser(ctx context.Context, request dto.LoginRequest) (*service.TokenPair, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (*service.TokenPair, error)
 	GetMeInfo(ctx context.Context) (*models.User, error)
 }
@@ -33,7 +33,7 @@ func NewUserHandler(svc UserService, cfg config.Config) *UserHandler {
 }
 
 func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	var req dto2.RegisterRequest
+	var req dto.RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		WriteError(w, r, http.StatusBadRequest, constant.ErrInvalidBody)
 		return
@@ -55,12 +55,12 @@ func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	writeJSON(w, http.StatusCreated, dto2.NewRegisterResponse(user))
+	writeJSON(w, http.StatusCreated, dto.NewRegisterResponse(user))
 
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
-	var req dto2.LoginRequest
+	var req dto.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		WriteError(w, r, http.StatusBadRequest, constant.ErrInvalidBody)
 		return
@@ -91,7 +91,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, cookie)
 
-	writeJSON(w, http.StatusOK, dto2.TokenResponse{
+	writeJSON(w, http.StatusOK, dto.TokenResponse{
 		AccessToken: tokens.AccessToken,
 	})
 }
@@ -109,7 +109,7 @@ func (h *UserHandler) MeInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userResponse := dto2.NewUserResponse(user)
+	userResponse := dto.NewUserResponse(user)
 	writeJSON(w, http.StatusOK, userResponse)
 }
 
@@ -149,7 +149,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, newCookie)
 
-	writeJSON(w, http.StatusOK, dto2.TokenResponse{
+	writeJSON(w, http.StatusOK, dto.TokenResponse{
 		AccessToken: tokens.AccessToken,
 	})
 }
