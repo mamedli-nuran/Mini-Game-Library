@@ -106,8 +106,25 @@ func (r *UserRepository) FindRefreshToken(ctx context.Context, hashedToken strin
 	return &rt, nil
 }
 
-func (r *UserRepository) RevokeRefreshToken(ctx context.Context, id uuid.UUID) error {
-	sql := `UPDATE refresh_tokens SET is_active=false WHERE id=$1`
-	_, err := r.pool.Exec(ctx, sql, id)
-	return err
+func (r *UserRepository) RotateRefreshToken(ctx context.Context, oldTokenId uuid.UUID, newToken models.RefreshToken) error {
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	revokeSQL := "UPDATE refresh_tokens SET is_active=false WHERE id=$1"
+	_, err = tx.Exec(ctx, revokeSQL, oldTokenId)
+	if err != nil {
+		return err
+	}
+
+	insertSQL := `INSERT INTO refresh_tokens (id, user_id, hashed_token, is_active, expires_at)
+			VALUES ($1, $2, $3, $4, $5)`
+	_, err = tx.Exec(ctx, insertSQL, newToken.Id, newToken.UserId, newToken.HashedToken, newToken.IsActive, newToken.ExpiresAt)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit(ctx)
 }

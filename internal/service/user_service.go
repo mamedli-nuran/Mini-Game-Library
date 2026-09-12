@@ -28,7 +28,7 @@ type UserRepository interface {
 	FindUserById(ctx context.Context, userID uuid.UUID) (*models.User, error)
 	SaveRefreshToken(ctx context.Context, token models.RefreshToken) error
 	FindRefreshToken(ctx context.Context, hashedToken string) (*models.RefreshToken, error)
-	RevokeRefreshToken(ctx context.Context, id uuid.UUID) error
+	RotateRefreshToken(ctx context.Context, oldTokenId uuid.UUID, newToken models.RefreshToken) error
 }
 
 type UserService struct {
@@ -135,8 +135,6 @@ func (s *UserService) RefreshTokens(ctx context.Context, refreshToken string) (*
 		return nil, apperror.ErrUnauthorized
 	}
 
-	_ = s.repo.RevokeRefreshToken(ctx, rt.Id)
-
 	user, err := s.repo.FindUserById(ctx, rt.UserId)
 	if err != nil {
 		return nil, err
@@ -161,7 +159,7 @@ func (s *UserService) RefreshTokens(ctx context.Context, refreshToken string) (*
 		ExpiresAt:   time.Now().Add(s.cfg.RefreshTokenExpireHours),
 	}
 
-	if err := s.repo.SaveRefreshToken(ctx, newRt); err != nil {
+	if err := s.repo.RotateRefreshToken(ctx, rt.Id, newRt); err != nil {
 		return nil, err
 	}
 
