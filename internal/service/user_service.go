@@ -55,7 +55,7 @@ func (s *UserService) RegisterUser(ctx context.Context, request dto.RegisterRequ
 	}
 
 	user := models.User{
-		Id:       uuid.New(),
+		Id:       uuid.Must(uuid.NewV7()),
 		Username: request.Username,
 		Email:    request.Email,
 	}
@@ -104,7 +104,7 @@ func (s *UserService) LoginUser(ctx context.Context, request dto.LoginRequest) (
 
 	hashedToken := hashToken(refreshToken)
 	rt := models.RefreshToken{
-		Id:          uuid.New(),
+		Id:          uuid.Must(uuid.NewV7()),
 		UserId:      user.Id,
 		HashedToken: hashedToken,
 		IsActive:    true,
@@ -154,7 +154,7 @@ func (s *UserService) RefreshTokens(ctx context.Context, refreshToken string) (*
 
 	newHashedToken := hashToken(newRefreshToken)
 	newRt := models.RefreshToken{
-		Id:          uuid.New(),
+		Id:          uuid.Must(uuid.NewV7()),
 		UserId:      user.Id,
 		HashedToken: newHashedToken,
 		IsActive:    true,

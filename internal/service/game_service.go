@@ -55,7 +55,7 @@ func (s *GameService) FindGameById(ctx context.Context, id uuid.UUID) (*models.G
 
 func (s *GameService) CreateGame(ctx context.Context, req dto.CreateGameRequest) (*models.Game, error) {
 	game := &models.Game{
-		Id:          uuid.New(),
+		Id:          uuid.Must(uuid.NewV7()),
 		Title:       req.Title,
 		Description: req.Description,
 		Genre:       models.Genre(req.Genre),
