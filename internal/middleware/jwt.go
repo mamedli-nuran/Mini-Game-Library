@@ -50,6 +50,7 @@ func JWTMiddleware(jwtSecret string, next http.HandlerFunc) http.HandlerFunc {
 		userID, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			handler.WriteError(w, r, http.StatusUnauthorized, constant2.ErrUnauthorized)
+			return
 		}
 
 		ctx := context.WithValue(r.Context(), constant2.UserIDKey, userID)
