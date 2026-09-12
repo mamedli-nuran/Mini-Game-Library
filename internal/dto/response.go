@@ -22,13 +22,10 @@ type ErrorResponse struct {
 }
 
 type RegisterResponse struct {
-	Id uuid.UUID `json:"id"`
 }
 
 func NewRegisterResponse(user *models.User) RegisterResponse {
-	return RegisterResponse{
-		Id: user.Id,
-	}
+	return RegisterResponse{}
 }
 
 type UserResponse struct {
