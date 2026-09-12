@@ -73,3 +73,15 @@ func (r *LibraryRepository) UpdateLibraryStatus(ctx context.Context, userID, gam
 	}
 	return &item, nil
 }
+
+func (r *LibraryRepository) RemoveFromLibrary(ctx context.Context, userID, gameID uuid.UUID) error {
+	sql := `DELETE FROM library_items WHERE user_id = $1 AND game_id = $2`
+	commandTag, err := r.pool.Exec(ctx, sql, userID, gameID)
+	if err != nil {
+		return fmt.Errorf("failed to remove from library: %w", err)
+	}
+	if commandTag.RowsAffected() == 0 {
+		return apperror.ErrLibraryNotFound
+	}
+	return nil
+}

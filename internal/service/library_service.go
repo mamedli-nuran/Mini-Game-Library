@@ -13,6 +13,7 @@ type LibraryRepository interface {
 	GetUserLibrary(ctx context.Context, userID uuid.UUID) ([]*models.LibraryItem, error)
 	AddToLibrary(ctx context.Context, item *models.LibraryItem) error
 	UpdateLibraryStatus(ctx context.Context, userID, gameID uuid.UUID, status models.LibraryStatus) (*models.LibraryItem, error)
+	RemoveFromLibrary(ctx context.Context, userID, gameID uuid.UUID) error
 }
 
 type LibraryService struct {
@@ -50,4 +51,8 @@ func (s *LibraryService) AddToLibrary(ctx context.Context, userID uuid.UUID, req
 func (s *LibraryService) UpdateLibraryStatus(ctx context.Context, userID, gameID uuid.UUID, req dto.UpdateLibraryStatusRequest) (*models.LibraryItem, error) {
 	status := models.LibraryStatus(req.Status)
 	return s.repo.UpdateLibraryStatus(ctx, userID, gameID, status)
+}
+
+func (s *LibraryService) RemoveFromLibrary(ctx context.Context, userID, gameID uuid.UUID) error {
+	return s.repo.RemoveFromLibrary(ctx, userID, gameID)
 }

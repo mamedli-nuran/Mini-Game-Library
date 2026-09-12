@@ -17,6 +17,7 @@ type LibraryService interface {
 	GetUserLibrary(ctx context.Context, userID uuid.UUID) ([]*models.LibraryItem, error)
 	AddToLibrary(ctx context.Context, userID uuid.UUID, req dto.AddToLibraryRequest) (*models.LibraryItem, error)
 	UpdateLibraryStatus(ctx context.Context, userID, gameID uuid.UUID, req dto.UpdateLibraryStatusRequest) (*models.LibraryItem, error)
+	RemoveFromLibrary(ctx context.Context, userID, gameID uuid.UUID) error
 }
 
 type LibraryHandler struct {
@@ -125,4 +126,36 @@ func (h *LibraryHandler) UpdateLibraryStatus(w http.ResponseWriter, r *http.Requ
 	}
 
 	writeJSON(w, http.StatusOK, dto.NewLibraryItemResponse(item))
+}
+
+func (h *LibraryHandler) RemoveFromLibrary(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(constant.UserIDKey).(uuid.UUID)
+	if !ok {
+		WriteError(w, r, http.StatusUnauthorized, constant.ErrUnauthorized)
+		return
+	}
+
+	gameIDStr := r.PathValue("gameId")
+	if gameIDStr == "" {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrMissingId)
+		return
+	}
+
+	gameID, err := uuid.Parse(gameIDStr)
+	if err != nil {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrParseId)
+		return
+	}
+
+	err = h.svc.RemoveFromLibrary(r.Context(), userID, gameID)
+	if err != nil {
+		if errors.Is(err, apperror.ErrLibraryNotFound) {
+			WriteError(w, r, http.StatusNotFound, apperror.ErrLibraryNotFound.Error())
+			return
+		}
+		WriteError(w, r, http.StatusInternalServerError, constant.ErrInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

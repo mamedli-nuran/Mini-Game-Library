@@ -32,6 +32,7 @@ func Setup(
 	mux.HandleFunc("GET /me/library", middleware.JWTMiddleware(cfg.JWTSecret, libraryHandler.GetLibrary))
 	mux.HandleFunc("POST /me/library", middleware.JWTMiddleware(cfg.JWTSecret, libraryHandler.AddToLibrary))
 	mux.HandleFunc("PATCH /me/library/{gameId}", middleware.JWTMiddleware(cfg.JWTSecret, libraryHandler.UpdateLibraryStatus))
+	mux.HandleFunc("DELETE /me/library/{gameId}", middleware.JWTMiddleware(cfg.JWTSecret, libraryHandler.RemoveFromLibrary))
 
 	return mux
 }
