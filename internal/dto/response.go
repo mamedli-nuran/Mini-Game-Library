@@ -88,3 +88,19 @@ func NewGamesResponse(games []*models.Game, total int) GamesResponse {
 type TokenResponse struct {
 	AccessToken string `json:"access_token"`
 }
+
+type LibraryItemResponse struct {
+	Id      uuid.UUID            `json:"id"`
+	GameId  uuid.UUID            `json:"game_id"`
+	Status  models.LibraryStatus `json:"status"`
+	AddedAt time.Time            `json:"added_at"`
+}
+
+func NewLibraryItemResponse(item *models.LibraryItem) LibraryItemResponse {
+	return LibraryItemResponse{
+		Id:      item.Id,
+		GameId:  item.GameId,
+		Status:  item.Status,
+		AddedAt: item.AddedAt,
+	}
+}

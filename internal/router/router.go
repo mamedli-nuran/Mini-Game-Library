@@ -10,6 +10,7 @@ import (
 func Setup(
 	userHandler *handler.UserHandler,
 	gameHandler *handler.GameHandler,
+	libraryHandler *handler.LibraryHandler,
 	cfg config.Config,
 ) *http.ServeMux {
 	mux := http.NewServeMux()
@@ -26,5 +27,9 @@ func Setup(
 	mux.HandleFunc("POST /games", middleware.JWTMiddleware(cfg.JWTSecret, gameHandler.CreateGame))
 	mux.HandleFunc("PATCH /games/{id}", middleware.JWTMiddleware(cfg.JWTSecret, gameHandler.UpdateGame))
 	mux.HandleFunc("DELETE /games/{id}", middleware.JWTMiddleware(cfg.JWTSecret, gameHandler.DeleteGame))
+
+	// library
+	mux.HandleFunc("GET /me/library", middleware.JWTMiddleware(cfg.JWTSecret, libraryHandler.GetLibrary))
+
 	return mux
 }

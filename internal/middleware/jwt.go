@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	constant2 "mini-game-library/internal/constant"
+	"mini-game-library/internal/constant"
 	"mini-game-library/internal/handler"
 	"net/http"
 	"strings"
@@ -15,19 +15,19 @@ func JWTMiddleware(jwtSecret string, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			handler.WriteError(w, r, http.StatusUnauthorized, constant2.ErrUnauthorized)
+			handler.WriteError(w, r, http.StatusUnauthorized, constant.ErrUnauthorized)
 			return
 		}
 
 		scheme := "Bearer "
 		if len(authHeader) < len(scheme) {
-			handler.WriteError(w, r, http.StatusUnauthorized, constant2.ErrUnauthorized)
+			handler.WriteError(w, r, http.StatusUnauthorized, constant.ErrUnauthorized)
 			return
 		}
 
 		userScheme := authHeader[:len(scheme)]
 		if !strings.EqualFold(scheme, userScheme) {
-			handler.WriteError(w, r, http.StatusUnauthorized, constant2.ErrUnauthorized)
+			handler.WriteError(w, r, http.StatusUnauthorized, constant.ErrUnauthorized)
 			return
 		}
 
@@ -43,17 +43,17 @@ func JWTMiddleware(jwtSecret string, next http.HandlerFunc) http.HandlerFunc {
 		)
 
 		if err != nil {
-			handler.WriteError(w, r, http.StatusUnauthorized, constant2.ErrUnauthorized)
+			handler.WriteError(w, r, http.StatusUnauthorized, constant.ErrUnauthorized)
 			return
 		}
 
 		userID, err := uuid.Parse(claims.Subject)
 		if err != nil {
-			handler.WriteError(w, r, http.StatusUnauthorized, constant2.ErrUnauthorized)
+			handler.WriteError(w, r, http.StatusUnauthorized, constant.ErrUnauthorized)
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), constant2.UserIDKey, userID)
+		ctx := context.WithValue(r.Context(), constant.UserIDKey, userID)
 		next(w, r.WithContext(ctx))
 	}
 }

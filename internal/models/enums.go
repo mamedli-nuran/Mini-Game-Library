@@ -9,55 +9,57 @@ import (
 type Genre string
 
 const (
-	GenreAction          Genre = "ACTION"
-	GenreAdventure       Genre = "ADVENTURE"
-	GenreActionAdventure Genre = "ACTION_ADVENTURE"
-	GenreShooter         Genre = "SHOOTER"
-	GenreFighting        Genre = "FIGHTING"
-	GenreStealth         Genre = "STEALTH"
-	GenreRPG             Genre = "RPG"
-	GenreActionRPG       Genre = "ACTION_RPG"
-	GenreJRPG            Genre = "JRPG"
-	GenreMMORPG          Genre = "MMORPG"
-	GenreSimulation      Genre = "SIMULATION"
-	GenreSports          Genre = "SPORTS"
-	GenreRacing          Genre = "RACING"
-	GenreStrategy        Genre = "STRATEGY"
-	GenrePuzzle          Genre = "PUZZLE"
-	GenrePlatformer      Genre = "PLATFORMER"
-	GenreHorror          Genre = "HORROR"
-	GenreSurvival        Genre = "SURVIVAL"
-	GenreSandbox         Genre = "SANDBOX"
-	GenreRoguelike       Genre = "ROGUELIKE"
-	GenreMetroidvania    Genre = "METROIDVANIA"
-	GenreMOBA            Genre = "MOBA"
-	GenreCasual          Genre = "CASUAL"
+	GenreAction               Genre = "ACTION"
+	GenreAdventure            Genre = "ADVENTURE"
+	GenreActionAdventure      Genre = "ACTION_ADVENTURE"
+	GenreShooter              Genre = "SHOOTER"
+	GenreFighting             Genre = "FIGHTING"
+	GenreStealth              Genre = "STEALTH"
+	GenreRPG                  Genre = "RPG"
+	GenreActionRPG            Genre = "ACTION_RPG"
+	GenreJRPG                 Genre = "JRPG"
+	GenreMMORPG               Genre = "MMORPG"
+	GenreSimulation           Genre = "SIMULATION"
+	GenreSports               Genre = "SPORTS"
+	GenreRacing               Genre = "RACING"
+	GenreStrategy             Genre = "STRATEGY"
+	GenrePuzzle               Genre = "PUZZLE"
+	GenrePlatformer           Genre = "PLATFORMER"
+	GenreHorror               Genre = "HORROR"
+	GenreSurvival             Genre = "SURVIVAL"
+	GenreSandbox              Genre = "SANDBOX"
+	GenreRoguelike            Genre = "ROGUELIKE"
+	GenreRoguelikeDeckbuilder Genre = "ROGUELIKE_DECKBUILDER"
+	GenreMetroidvania         Genre = "METROIDVANIA"
+	GenreMOBA                 Genre = "MOBA"
+	GenreCasual               Genre = "CASUAL"
 )
 
 var validGenres = map[Genre]struct{}{
-	GenreAction:          {},
-	GenreAdventure:       {},
-	GenreActionAdventure: {},
-	GenreShooter:         {},
-	GenreFighting:        {},
-	GenreStealth:         {},
-	GenreRPG:             {},
-	GenreActionRPG:       {},
-	GenreJRPG:            {},
-	GenreMMORPG:          {},
-	GenreSimulation:      {},
-	GenreSports:          {},
-	GenreRacing:          {},
-	GenreStrategy:        {},
-	GenrePuzzle:          {},
-	GenrePlatformer:      {},
-	GenreHorror:          {},
-	GenreSurvival:        {},
-	GenreSandbox:         {},
-	GenreRoguelike:       {},
-	GenreMetroidvania:    {},
-	GenreMOBA:            {},
-	GenreCasual:          {},
+	GenreAction:               {},
+	GenreAdventure:            {},
+	GenreActionAdventure:      {},
+	GenreShooter:              {},
+	GenreFighting:             {},
+	GenreStealth:              {},
+	GenreRPG:                  {},
+	GenreActionRPG:            {},
+	GenreJRPG:                 {},
+	GenreMMORPG:               {},
+	GenreSimulation:           {},
+	GenreSports:               {},
+	GenreRacing:               {},
+	GenreStrategy:             {},
+	GenrePuzzle:               {},
+	GenrePlatformer:           {},
+	GenreHorror:               {},
+	GenreSurvival:             {},
+	GenreSandbox:              {},
+	GenreRoguelike:            {},
+	GenreRoguelikeDeckbuilder: {},
+	GenreMetroidvania:         {},
+	GenreMOBA:                 {},
+	GenreCasual:               {},
 }
 
 func (g Genre) IsValid() bool {
