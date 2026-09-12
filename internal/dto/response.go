@@ -24,10 +24,6 @@ type ErrorResponse struct {
 type RegisterResponse struct {
 }
 
-func NewRegisterResponse(user *models.User) RegisterResponse {
-	return RegisterResponse{}
-}
-
 type UserResponse struct {
 	Id        uuid.UUID `json:"id"`
 	Username  string    `json:"username"`

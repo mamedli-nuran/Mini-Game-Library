@@ -45,7 +45,7 @@ func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.svc.RegisterUser(r.Context(), req)
+	_, err := h.svc.RegisterUser(r.Context(), req)
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrUserDuplicate) {
@@ -55,7 +55,7 @@ func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	writeJSON(w, http.StatusCreated, dto.NewRegisterResponse(user))
+	writeJSON(w, http.StatusCreated, dto.RegisterResponse{})
 
 }
 
