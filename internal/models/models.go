@@ -32,3 +32,11 @@ type RefreshToken struct {
 	ExpiresAt   time.Time `json:"expires_at"`
 	CreatedAt   time.Time `json:"created_at"`
 }
+
+type LibraryItem struct {
+	Id      uuid.UUID     `json:"id"`
+	UserId  uuid.UUID     `json:"user_id"`
+	GameId  uuid.UUID     `json:"game_id"`
+	Status  LibraryStatus `json:"status"`
+	AddedAt time.Time     `json:"added_at"`
+}

@@ -79,3 +79,29 @@ func AllGenres() []Genre {
 	}
 	return genres
 }
+
+type LibraryStatus string
+
+const (
+	StatusWishlist  LibraryStatus = "WISHLIST"
+	StatusPlaying   LibraryStatus = "PLAYING"
+	StatusCompleted LibraryStatus = "COMPLETED"
+)
+
+var validLibraryStatuses = map[LibraryStatus]struct{}{
+	StatusWishlist:  {},
+	StatusPlaying:   {},
+	StatusCompleted: {},
+}
+
+func (s LibraryStatus) IsValid() bool {
+	_, ok := validLibraryStatuses[s]
+	return ok
+}
+
+func (s LibraryStatus) Validate() error {
+	if !s.IsValid() {
+		return fmt.Errorf("invalid library status: %q", string(s))
+	}
+	return nil
+}
