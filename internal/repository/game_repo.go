@@ -120,18 +120,42 @@ func (r GameRepository) CreateGame(ctx context.Context, game *models.Game) error
 	return nil
 }
 
-func (r GameRepository) UpdateGame(ctx context.Context, game *models.Game) error {
-	sql := `UPDATE games SET title=$1, description=$2, genre=$3, release_year=$4 WHERE id=$5`
-	_, err := r.pool.Exec(ctx, sql, game.Title, game.Description, game.Genre, game.ReleaseYear, game.Id)
+func (r GameRepository) UpdateGame(ctx context.Context, id uuid.UUID, updateFn func(*models.Game)) (*models.Game, error) {
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
+
+	sqlSelect := "SELECT id, title, description, genre, release_year, created_at FROM games WHERE id=$1 FOR UPDATE"
+	var game models.Game
+	err = tx.QueryRow(ctx, sqlSelect, id).
+		Scan(&game.Id, &game.Title, &game.Description, &game.Genre, &game.ReleaseYear, &game.CreatedAt)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, apperror.ErrGameNotFound
+		}
+		return nil, fmt.Errorf("%w: %w", apperror.ErrGetGame, err)
+	}
+
+	updateFn(&game)
+
+	sqlUpdate := "UPDATE games SET title=$1, description=$2, genre=$3, release_year=$4 WHERE id=$5"
+	_, err = tx.Exec(ctx, sqlUpdate, game.Title, game.Description, game.Genre, game.ReleaseYear, game.Id)
 	if err != nil {
 		if pgErr, ok := errors.AsType[*pgconn.PgError](err); ok {
 			if pgErr.Code == "23505" {
-				return apperror.ErrGameDuplicate
+				return nil, apperror.ErrGameDuplicate
 			}
 		}
-		return fmt.Errorf("failed to update game: %w", err)
+		return nil, fmt.Errorf("failed to update game: %w", err)
 	}
-	return nil
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+	return &game, nil
 }
 
 func (r GameRepository) DeleteGame(ctx context.Context, id uuid.UUID) error {

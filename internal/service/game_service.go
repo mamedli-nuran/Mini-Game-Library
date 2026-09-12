@@ -13,7 +13,7 @@ type GameRepository interface {
 	FindGames(ctx context.Context, filter *GameFilter) ([]*models.Game, int, error)
 	FindGameById(ctx context.Context, id uuid.UUID) (*models.Game, error)
 	CreateGame(ctx context.Context, game *models.Game) error
-	UpdateGame(ctx context.Context, game *models.Game) error
+	UpdateGame(ctx context.Context, id uuid.UUID, updateFn func(*models.Game)) (*models.Game, error)
 	DeleteGame(ctx context.Context, id uuid.UUID) error
 }
 
@@ -71,25 +71,21 @@ func (s *GameService) CreateGame(ctx context.Context, req dto.CreateGameRequest)
 }
 
 func (s *GameService) UpdateGame(ctx context.Context, id uuid.UUID, req dto.UpdateGameRequest) (*models.Game, error) {
-	game, err := s.repo.FindGameById(ctx, id)
-	if err != nil {
-		return nil, err
-	}
+	game, err := s.repo.UpdateGame(ctx, id, func(game *models.Game) {
+		if req.Title != nil {
+			game.Title = *req.Title
+		}
+		if req.Description != nil {
+			game.Description = *req.Description
+		}
+		if req.Genre != nil {
+			game.Genre = models.Genre(strings.ToUpper(*req.Genre))
+		}
+		if req.ReleaseYear != nil {
+			game.ReleaseYear = *req.ReleaseYear
+		}
+	})
 
-	if req.Title != nil {
-		game.Title = *req.Title
-	}
-	if req.Description != nil {
-		game.Description = *req.Description
-	}
-	if req.Genre != nil {
-		game.Genre = models.Genre(strings.ToUpper(*req.Genre))
-	}
-	if req.ReleaseYear != nil {
-		game.ReleaseYear = *req.ReleaseYear
-	}
-
-	err = s.repo.UpdateGame(ctx, game)
 	if err != nil {
 		return nil, err
 	}
