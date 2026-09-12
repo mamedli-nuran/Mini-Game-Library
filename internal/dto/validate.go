@@ -21,7 +21,7 @@ func (r *RegisterRequest) Validate() []ErrorDetail {
 		errors = append(errors, ErrorDetail{Field: "email", Message: constant.ErrInvalidEmail})
 	}
 
-	if passwordLen := len(r.Password); passwordLen < 12 || passwordLen > 25 {
+	if passwordLen := len(r.Password); passwordLen < 6 || passwordLen > 72 {
 		errors = append(errors, ErrorDetail{Field: "password", Message: constant.ErrPasswordLength})
 	}
 	return errors
@@ -36,7 +36,7 @@ func (r *LoginRequest) Validate() []ErrorDetail {
 		errors = append(errors, ErrorDetail{Field: "identifier", Message: constant.ErrIdentifierLength})
 	}
 
-	if passwordLen := len(r.Password); passwordLen < 12 || passwordLen > 25 {
+	if passwordLen := len(r.Password); passwordLen < 6 || passwordLen > 72 {
 		errors = append(errors, ErrorDetail{Field: "password", Message: constant.ErrPasswordLength})
 	}
 
