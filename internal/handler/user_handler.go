@@ -5,25 +5,30 @@ import (
 	"encoding/json"
 	"errors"
 	"mini-game-library/internal/apperror"
+	"mini-game-library/internal/config"
 	"mini-game-library/internal/constant"
 	dto2 "mini-game-library/internal/dto"
 	"mini-game-library/internal/models"
 	"mini-game-library/internal/service"
 	"net/http"
+	"time"
 )
 
 type UserService interface {
 	RegisterUser(ctx context.Context, request dto2.RegisterRequest) (*models.User, error)
 	LoginUser(ctx context.Context, request dto2.LoginRequest) (*service.TokenPair, error)
+	RefreshTokens(ctx context.Context, refreshToken string) (*service.TokenPair, error)
 	GetMeInfo(ctx context.Context) (*models.User, error)
 }
 type UserHandler struct {
 	svc UserService
+	cfg config.Config
 }
 
-func NewUserHandler(svc UserService) *UserHandler {
+func NewUserHandler(svc UserService, cfg config.Config) *UserHandler {
 	return &UserHandler{
 		svc: svc,
+		cfg: cfg,
 	}
 }
 
@@ -77,9 +82,18 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, struct {
-		AccessToken string
-	}{AccessToken: tokens.AccessToken})
+	cookie := &http.Cookie{
+		Name:     "refresh_token",
+		Value:    tokens.RefreshToken,
+		Path:     "/auth/refresh",
+		HttpOnly: true,
+		Expires:  time.Now().Add(h.cfg.RefreshTokenExpireHours),
+	}
+	http.SetCookie(w, cookie)
+
+	writeJSON(w, http.StatusOK, dto2.TokenResponse{
+		AccessToken: tokens.AccessToken,
+	})
 }
 
 func (h *UserHandler) MeInfo(w http.ResponseWriter, r *http.Request) {
@@ -97,4 +111,45 @@ func (h *UserHandler) MeInfo(w http.ResponseWriter, r *http.Request) {
 
 	userResponse := dto2.NewUserResponse(user)
 	writeJSON(w, http.StatusOK, userResponse)
+}
+
+func (h *UserHandler) Refresh(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("refresh_token")
+	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			WriteError(w, r, http.StatusUnauthorized, "missing refresh_token cookie")
+		} else {
+			WriteError(w, r, http.StatusBadRequest, "error reading refresh_token cookie")
+		}
+		return
+	}
+
+	refreshToken := cookie.Value
+	if refreshToken == "" {
+		WriteError(w, r, http.StatusUnauthorized, "refresh_token is empty")
+		return
+	}
+
+	tokens, err := h.svc.RefreshTokens(r.Context(), refreshToken)
+	if err != nil {
+		if errors.Is(err, apperror.ErrUnauthorized) {
+			WriteError(w, r, http.StatusUnauthorized, constant.ErrUnauthorized)
+		} else {
+			WriteError(w, r, http.StatusInternalServerError, constant.ErrInternalServerError)
+		}
+		return
+	}
+
+	newCookie := &http.Cookie{
+		Name:     "refresh_token",
+		Value:    tokens.RefreshToken,
+		Path:     "/auth/refresh",
+		HttpOnly: true,
+		Expires:  time.Now().Add(h.cfg.RefreshTokenExpireHours),
+	}
+	http.SetCookie(w, newCookie)
+
+	writeJSON(w, http.StatusOK, dto2.TokenResponse{
+		AccessToken: tokens.AccessToken,
+	})
 }

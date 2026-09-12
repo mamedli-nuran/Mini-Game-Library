@@ -17,6 +17,7 @@ func Setup(
 	// auth
 	mux.HandleFunc("POST /auth/register", userHandler.RegisterUser)
 	mux.HandleFunc("POST /auth/login", userHandler.Login)
+	mux.HandleFunc("POST /auth/refresh", userHandler.Refresh)
 	mux.HandleFunc("GET /auth/me", middleware.JWTMiddleware(cfg.JWTSecret, userHandler.MeInfo))
 
 	// game

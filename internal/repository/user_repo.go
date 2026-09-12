@@ -85,3 +85,29 @@ func (r *UserRepository) FindUserById(ctx context.Context, userID uuid.UUID) (*m
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) SaveRefreshToken(ctx context.Context, token models.RefreshToken) error {
+	sql := `INSERT INTO refresh_tokens (id, user_id, hashed_token, is_active, expires_at)
+			VALUES ($1, $2, $3, $4, $5)`
+	_, err := r.pool.Exec(ctx, sql, token.Id, token.UserId, token.HashedToken, token.IsActive, token.ExpiresAt)
+	return err
+}
+
+func (r *UserRepository) FindRefreshToken(ctx context.Context, hashedToken string) (*models.RefreshToken, error) {
+	sql := `SELECT id, user_id, hashed_token, is_active, expires_at, created_at 
+			FROM refresh_tokens WHERE hashed_token=$1`
+
+	var rt models.RefreshToken
+	err := r.pool.QueryRow(ctx, sql, hashedToken).Scan(
+		&rt.Id, &rt.UserId, &rt.HashedToken, &rt.IsActive, &rt.ExpiresAt, &rt.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &rt, nil
+}
+
+func (r *UserRepository) RevokeRefreshToken(ctx context.Context, id uuid.UUID) error {
+	sql := `UPDATE refresh_tokens SET is_active=false WHERE id=$1`
+	_, err := r.pool.Exec(ctx, sql, id)
+	return err
+}

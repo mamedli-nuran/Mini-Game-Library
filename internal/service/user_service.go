@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"mini-game-library/internal/apperror"
 	"mini-game-library/internal/config"
@@ -24,6 +26,9 @@ type UserRepository interface {
 	FindUserByEmail(ctx context.Context, email string) (*models.User, error)
 	FindUserByUsername(ctx context.Context, username string) (*models.User, error)
 	FindUserById(ctx context.Context, userID uuid.UUID) (*models.User, error)
+	SaveRefreshToken(ctx context.Context, token models.RefreshToken) error
+	FindRefreshToken(ctx context.Context, hashedToken string) (*models.RefreshToken, error)
+	RevokeRefreshToken(ctx context.Context, id uuid.UUID) error
 }
 
 type UserService struct {
@@ -97,11 +102,73 @@ func (s *UserService) LoginUser(ctx context.Context, request dto.LoginRequest) (
 		return nil, err
 	}
 
+	hashedToken := hashToken(refreshToken)
+	rt := models.RefreshToken{
+		Id:          uuid.New(),
+		UserId:      user.Id,
+		HashedToken: hashedToken,
+		IsActive:    true,
+		ExpiresAt:   time.Now().Add(s.cfg.RefreshTokenExpireHours),
+	}
+
+	if err := s.repo.SaveRefreshToken(ctx, rt); err != nil {
+		return nil, err
+	}
+
 	return &TokenPair{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
+}
 
+func (s *UserService) RefreshTokens(ctx context.Context, refreshToken string) (*TokenPair, error) {
+	hashedToken := hashToken(refreshToken)
+	rt, err := s.repo.FindRefreshToken(ctx, hashedToken)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, apperror.ErrUnauthorized
+		}
+		return nil, err
+	}
+
+	if !rt.IsActive || rt.ExpiresAt.Before(time.Now()) {
+		return nil, apperror.ErrUnauthorized
+	}
+
+	_ = s.repo.RevokeRefreshToken(ctx, rt.Id)
+
+	user, err := s.repo.FindUserById(ctx, rt.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	newAccessToken, err := s.generateAccessToken(user.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	newRefreshToken, err := GenerateRefreshToken()
+	if err != nil {
+		return nil, err
+	}
+
+	newHashedToken := hashToken(newRefreshToken)
+	newRt := models.RefreshToken{
+		Id:          uuid.New(),
+		UserId:      user.Id,
+		HashedToken: newHashedToken,
+		IsActive:    true,
+		ExpiresAt:   time.Now().Add(s.cfg.RefreshTokenExpireHours),
+	}
+
+	if err := s.repo.SaveRefreshToken(ctx, newRt); err != nil {
+		return nil, err
+	}
+
+	return &TokenPair{
+		AccessToken:  newAccessToken,
+		RefreshToken: newRefreshToken,
+	}, nil
 }
 
 func (s *UserService) GetMeInfo(ctx context.Context) (*models.User, error) {
@@ -135,4 +202,9 @@ func GenerateRefreshToken() (string, error) {
 		return "", err
 	}
 	return base64.URLEncoding.EncodeToString(b), nil
+}
+
+func hashToken(token string) string {
+	hash := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(hash[:])
 }

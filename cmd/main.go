@@ -34,7 +34,7 @@ func main() {
 	userService := service2.NewUserService(userRepo, cfg)
 	gameService := service2.NewGameService(gameRepo)
 
-	userHandler := handler2.NewUserHandler(userService)
+	userHandler := handler2.NewUserHandler(userService, cfg)
 	gameHandler := handler2.NewGameHandler(gameService, cfg)
 
 	mux := router.Setup(userHandler, gameHandler, cfg)

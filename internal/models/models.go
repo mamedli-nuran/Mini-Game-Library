@@ -26,7 +26,7 @@ type Game struct {
 
 type RefreshToken struct {
 	Id          uuid.UUID `json:"id"`
-	UserId      int       `json:"user_id"`
+	UserId      uuid.UUID `json:"user_id"`
 	HashedToken string    `json:"token"`
 	IsActive    bool      `json:"is_active"`
 	ExpiresAt   time.Time `json:"expires_at"`

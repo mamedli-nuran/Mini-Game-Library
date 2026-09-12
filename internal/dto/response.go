@@ -91,3 +91,7 @@ func NewGamesResponse(games []*models.Game, total int) GamesResponse {
 		},
 	}
 }
+
+type TokenResponse struct {
+	AccessToken string `json:"access_token"`
+}
