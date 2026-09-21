@@ -13,6 +13,7 @@ import (
 
 type RatingService interface {
 	SubmitRating(ctx context.Context, userId uuid.UUID, gameId uuid.UUID, ratingValue int) (*models.Rating, error)
+	GetRatings(ctx context.Context, gameId uuid.UUID) ([]*models.Rating, error)
 }
 
 type RatingHandler struct {
@@ -62,4 +63,31 @@ func (h *RatingHandler) SubmitRating(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, rating)
+}
+
+func (h *RatingHandler) GetRatings(w http.ResponseWriter, r *http.Request) {
+	gameIDStr := r.PathValue("gameId")
+	if gameIDStr == "" {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrMissingId)
+		return
+	}
+
+	gameID, err := uuid.Parse(gameIDStr)
+	if err != nil {
+		WriteError(w, r, http.StatusBadRequest, constant.ErrParseId)
+		return
+	}
+
+	ratings, err := h.svc.GetRatings(r.Context(), gameID)
+	if err != nil {
+		WriteError(w, r, http.StatusInternalServerError, constant.ErrInternalServerError)
+		return
+	}
+
+	var res = make([]dto.RatingResponse, 0)
+	for _, rating := range ratings {
+		res = append(res, dto.NewRatingResponse(rating))
+	}
+
+	writeJSON(w, http.StatusOK, res)
 }

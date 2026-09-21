@@ -33,3 +33,28 @@ func (r *RatingRepository) CreateOrUpdateRating(ctx context.Context, rating *mod
 	}
 	return nil
 }
+
+func (r *RatingRepository) GetRatingsByGameId(ctx context.Context, gameId uuid.UUID) ([]*models.Rating, error) {
+	sql := `SELECT id, user_id, game_id, rating, created_at FROM ratings WHERE game_id = $1 ORDER BY created_at DESC`
+	rows, err := r.pool.Query(ctx, sql, gameId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var ratings []*models.Rating
+	for rows.Next() {
+		var rating models.Rating
+		if err := rows.Scan(&rating.Id, &rating.UserId, &rating.GameId, &rating.Rating, &rating.CreatedAt); err != nil {
+			return nil, err
+		}
+		ratings = append(ratings, &rating)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	if ratings == nil {
+		ratings = make([]*models.Rating, 0)
+	}
+	return ratings, nil
+}

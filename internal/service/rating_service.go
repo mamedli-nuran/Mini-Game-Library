@@ -9,6 +9,7 @@ import (
 
 type RatingRepo interface {
 	CreateOrUpdateRating(ctx context.Context, rating *models.Rating) error
+	GetRatingsByGameId(ctx context.Context, gameId uuid.UUID) ([]*models.Rating, error)
 }
 
 type RatingService struct {
@@ -32,4 +33,8 @@ func (s *RatingService) SubmitRating(ctx context.Context, userId uuid.UUID, game
 		return nil, err
 	}
 	return rating, nil
+}
+
+func (s *RatingService) GetRatings(ctx context.Context, gameId uuid.UUID) ([]*models.Rating, error) {
+	return s.repo.GetRatingsByGameId(ctx, gameId)
 }

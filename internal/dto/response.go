@@ -104,3 +104,21 @@ func NewLibraryItemResponse(item *models.LibraryItem) LibraryItemResponse {
 		AddedAt: item.AddedAt,
 	}
 }
+
+type RatingResponse struct {
+	Id        uuid.UUID `json:"id"`
+	UserId    uuid.UUID `json:"user_id"`
+	GameId    uuid.UUID `json:"game_id"`
+	Rating    int       `json:"rating"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func NewRatingResponse(rating *models.Rating) RatingResponse {
+	return RatingResponse{
+		Id:        rating.Id,
+		UserId:    rating.UserId,
+		GameId:    rating.GameId,
+		Rating:    rating.Rating,
+		CreatedAt: rating.CreatedAt,
+	}
+}

@@ -37,6 +37,7 @@ func Setup(
 
 	// ratings
 	mux.HandleFunc("POST /games/{gameId}/rating", middleware.JWTMiddleware(cfg.JWTSecret, ratingHandler.SubmitRating))
+	mux.HandleFunc("GET /games/{gameId}/ratings", ratingHandler.GetRatings)
 
 	return mux
 }
