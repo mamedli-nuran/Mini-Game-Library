@@ -40,3 +40,11 @@ type LibraryItem struct {
 	Status  LibraryStatus `json:"status"`
 	AddedAt time.Time     `json:"added_at"`
 }
+
+type Rating struct {
+	Id        uuid.UUID `json:"id"`
+	UserId    uuid.UUID `json:"user_id"`
+	GameId    uuid.UUID `json:"game_id"`
+	Rating    int       `json:"rating"`
+	CreatedAt time.Time `json:"created_at"`
+}
