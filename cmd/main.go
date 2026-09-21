@@ -31,16 +31,19 @@ func main() {
 	userRepo := repository2.NewUserRepository(pool)
 	gameRepo := repository2.NewGameRepository(pool)
 	libraryRepo := repository2.NewLibraryRepository(pool)
+	ratingRepo := repository2.NewRatingRepository(pool)
 
 	userService := service2.NewUserService(userRepo, cfg)
 	gameService := service2.NewGameService(gameRepo)
 	libraryService := service2.NewLibraryService(libraryRepo)
+	ratingService := service2.NewRatingService(ratingRepo)
 
 	userHandler := handler2.NewUserHandler(userService, cfg)
 	gameHandler := handler2.NewGameHandler(gameService, cfg)
 	libraryHandler := handler2.NewLibraryHandler(libraryService)
+	ratingHandler := handler2.NewRatingHandler(ratingService)
 
-	mux := router.Setup(userHandler, gameHandler, libraryHandler, cfg)
+	mux := router.Setup(userHandler, gameHandler, libraryHandler, ratingHandler, cfg)
 
 	slog.Info("Server starting on :8080")
 	err = http.ListenAndServe(":8080", mux)

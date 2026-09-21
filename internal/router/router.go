@@ -11,6 +11,7 @@ func Setup(
 	userHandler *handler.UserHandler,
 	gameHandler *handler.GameHandler,
 	libraryHandler *handler.LibraryHandler,
+	ratingHandler *handler.RatingHandler,
 	cfg config.Config,
 ) *http.ServeMux {
 	mux := http.NewServeMux()
@@ -33,6 +34,9 @@ func Setup(
 	mux.HandleFunc("POST /me/library", middleware.JWTMiddleware(cfg.JWTSecret, libraryHandler.AddToLibrary))
 	mux.HandleFunc("PATCH /me/library/{gameId}", middleware.JWTMiddleware(cfg.JWTSecret, libraryHandler.UpdateLibraryStatus))
 	mux.HandleFunc("DELETE /me/library/{gameId}", middleware.JWTMiddleware(cfg.JWTSecret, libraryHandler.RemoveFromLibrary))
+
+	// ratings
+	mux.HandleFunc("POST /games/{gameId}/rating", middleware.JWTMiddleware(cfg.JWTSecret, ratingHandler.SubmitRating))
 
 	return mux
 }

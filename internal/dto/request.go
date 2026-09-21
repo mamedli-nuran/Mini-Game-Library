@@ -33,3 +33,7 @@ type AddToLibraryRequest struct {
 type UpdateLibraryStatusRequest struct {
 	Status string `json:"status"`
 }
+
+type RatingRequest struct {
+	Rating int `json:"rating"`
+}

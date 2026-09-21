@@ -130,3 +130,13 @@ func (r *UpdateLibraryStatusRequest) Validate() []ErrorDetail {
 
 	return errors
 }
+
+func (r *RatingRequest) Validate() []ErrorDetail {
+	var errors []ErrorDetail
+
+	if r.Rating < 1 || r.Rating > 5 {
+		errors = append(errors, ErrorDetail{Field: "rating", Message: "Rating must be between 1 and 5"})
+	}
+
+	return errors
+}
