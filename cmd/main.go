@@ -48,6 +48,6 @@ func main() {
 	slog.Info("Server starting on :8080")
 	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
-		slog.Info("Error starting server: ", err)
+		slog.Info("Server stopped", slog.Any("error", err))
 	}
 }
